@@ -10,7 +10,9 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "firebase": "^8.10.0",
+    "uuid": "^8.3.2",
     "vue": "^2.6.11",
+    "vue-cookies": "^1.7.4",
     "vuefire": "^2.2.5"
   },
   "devDependencies": {

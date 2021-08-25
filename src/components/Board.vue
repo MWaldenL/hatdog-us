@@ -14,19 +14,28 @@ export default {
   created() {
     window.addEventListener('keydown', e => this.move(e.key))
   },
+  mounted() {
+    this.row = this.startRow
+    this.col = this.startCol
+    this.board[this.startRow][this.startCol] = 'o' 
+  },
   data() {
     return {
       board: [
         ['', '', ''],
-        ['', 'o', ''],
+        ['', '', ''],
         ['', '', '']
       ],
-      row: 1, 
-      col: 1,
+      row: -1,
+      col: -1
     }
   },
   components: {
     Square
+  },
+  props: {
+    startRow: Number,
+    startCol: Number
   },
   methods: {
     hasPiece(square) {
