@@ -11,32 +11,32 @@
 
 <script>
 import Square from './Square'
-import { db, usersRef } from '@/firebase'
+import { db, playersRef } from '@/firebase'
 export default {
   created() {
     window.addEventListener('keydown', e => this.move(e.key))
     this.row = this.startRow
     this.col = this.startCol
-    usersRef.on('value', () => {
+    playersRef.on('value', () => {
       this.showPlayers()
     })
   },
   data() {
     return {
       board: new Array(15).fill(null).map(() => Array(15)),
-      users: [],
+      players: [],
       row: -1,
       col: -1
     }
   },
   firebase: {
-    users: usersRef,
+    players: playersRef,
   },
   components: {
     Square
   },
   props: {
-    userID: String,
+    playerID: String,
     startRow: Number,
     startCol: Number
   },
@@ -45,7 +45,7 @@ export default {
       return square == 'o'
     },
     updatePos() {
-      db.ref(`users/${this.userID}/`).update({
+      db.ref(`players/${this.playerID}/`).update({
         'square': {
           'row': this.row,
           'col': this.col
@@ -53,8 +53,6 @@ export default {
       })
     },
     move(direction) {
-      let boardCopy = JSON.parse(JSON.stringify(this.board))
-      boardCopy[this.row][this.col] = ''
       switch(direction) {
         case 'ArrowUp':
           this.row = Math.max(this.row-1, 0); 
@@ -73,14 +71,12 @@ export default {
           this.updatePos();
           break;
       }
-      boardCopy[this.row][this.col] = 'o'
-      this.board = boardCopy
     },
     showPlayers() {
       let newBoard = new Array(15).fill(null).map(() => Array(15))
       newBoard[this.row][this.col] = 'o' // this player
-      for (let user of this.users) { // other players
-        let {row, col} = user.square
+      for (let player of this.players) { // other players
+        let {row, col} = player.square
         newBoard[row][col] = 'o'
       }
       this.board = newBoard

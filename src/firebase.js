@@ -13,5 +13,5 @@ const db = firebase.initializeApp({
   appId: "1:845117230098:web:2686edbafbbf18389cdccb"
 }).database()
 
-const usersRef = db.ref(`users`)
-export { db, usersRef }
+const playersRef = db.ref(`players`)
+export { db, playersRef }
