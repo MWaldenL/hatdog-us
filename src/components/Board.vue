@@ -11,7 +11,8 @@
 
 <script>
 import Square from './Square'
-import { db, playersRef } from '@/firebase'
+import PlayerRepository from '@/model/repository/playerRepository'
+import { playersRef } from '@/firebase'
 export default {
   created() {
     window.addEventListener('keydown', e => this.move(e.key))
@@ -23,7 +24,7 @@ export default {
   },
   data() {
     return {
-      board: new Array(15).fill(null).map(() => Array(15)),
+      board: Array.from(Array(15), () => Array(15).fill('')),
       players: [],
       row: -1,
       col: -1
@@ -45,35 +46,46 @@ export default {
       return square == 'o'
     },
     updatePos() {
-      db.ref(`players/${this.playerID}/`).update({
-        'square': {
-          'row': this.row,
-          'col': this.col
-        }
+      PlayerRepository.updatePlayer(this.playerID, 'square', {
+        'row': this.row,
+        'col': this.col
       })
     },
     move(direction) {
+      let newRow, newCol
       switch(direction) {
         case 'ArrowUp':
-          this.row = Math.max(this.row-1, 0); 
-          this.updatePos()
+          newRow = Math.max(this.row-1, 0)
+          if (this.board[newRow][this.col] === '') {
+            this.row = newRow
+            this.updatePos()
+          }
           break;
         case 'ArrowLeft':
-          this.col = Math.max(this.col-1, 0); 
-          this.updatePos();
+          newCol = Math.max(this.col-1, 0)
+          if (this.board[this.row][newCol] === '') {
+            this.col = newCol
+            this.updatePos();
+          }
           break;
         case 'ArrowDown':
-          this.row = Math.min(this.row+1, this.board.length-1); 
-          this.updatePos();
+          newRow = Math.min(this.row+1, this.board.length-1); 
+          if (this.board[newRow][this.col] === '') {
+            this.row = newRow
+            this.updatePos();
+          }
           break;
         case 'ArrowRight':
-          this.col = Math.min(this.col+1, this.board.length-1);
-          this.updatePos();
+          newCol = Math.min(this.col+1, this.board.length-1);
+          if (this.board[this.row][newCol] === '') {
+            this.col = newCol
+            this.updatePos();
+          }
           break;
       }
     },
     showPlayers() {
-      let newBoard = new Array(15).fill(null).map(() => Array(15))
+      let newBoard = Array.from(Array(15), () => Array(15).fill(''))
       newBoard[this.row][this.col] = 'o' // this player
       for (let player of this.players) { // other players
         let {row, col} = player.square

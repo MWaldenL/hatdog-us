@@ -1,7 +1,7 @@
 <template>
   <div id="entryForm" v-if="!entered">
     <h1>Enter Name:</h1> 
-    <input type="text" v-model="name" />
+    <input type="text" @keyup.enter="enterGame" v-model="name" />
     <button @click="enterGame">Play</button>
   </div>
   <div id="home" v-else>

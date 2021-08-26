@@ -11,6 +11,10 @@ export default class PlayerRepository {
     })
   }
 
+  static removePlayer(id) {
+    db.ref(`players/${id}`).remove()
+  }
+
   static observeOnlineStatus(id) {
     if (id.length === 0) {
       return 
@@ -25,7 +29,7 @@ export default class PlayerRepository {
     })
   }
 
-  static removePlayer(id) {
-    db.ref(`players/${id}`).remove()
+  static updatePlayer(id, field, value) {
+    db.ref(`players/${id}/${field}`).set(value)
   }
 }
