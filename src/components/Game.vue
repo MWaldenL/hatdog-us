@@ -11,7 +11,10 @@
         <li v-if="user.online">{{ user.name }}</li>
       </ul>
     </div>
-    <Board :startRow="row" :startCol="col" />
+    <Board 
+      :userID="userID"
+      :startRow="row" 
+      :startCol="col" />
   </div>
 </template>
 
@@ -19,27 +22,23 @@
 import { db, usersRef } from "@/firebase"
 import Board from './Board'
 export default {
-  components: {
-    Board
-  },
-  firebase: {
-    users: usersRef
-  },
-  created() {
-    if (this.$cookies.get('userID') !== null) { 
-      this.userID = this.$cookies.get('userID')
-      console.log(this.userID)
-    }
+  async created() {
     this.setOnline()
   },
   data() {
     return {
       name: '',
-      users: [],
       userID: '',
+      users: [],
       row: -1,
       col: -1
     }
+  },
+  firebase: {
+    users: usersRef
+  },
+  components: {
+    Board
   },
   computed: {
     entered() {
@@ -67,11 +66,11 @@ export default {
     },
     enterNew() {
       this.userID = Date.now().toString()
-      this.$cookies.set('userID', this.userID)
-      this.$cookies.set('name', this.name)
-      this.row = this.getRandomInt(0,3)
-      this.col = this.getRandomInt(0,3)
-      db.ref(`users/${this.userID}`).set({
+      do {
+        this.row = this.getRandomInt(0, 15)
+        this.col = this.getRandomInt(0, 15)
+      } while (this.occupied(this.row, this.col))
+      db.ref(`users/${this.userID}`).set({ // add a new player
         gameID: 'sample123',
         name: this.name,
         square: {'row': this.row, 'col': this.col},
@@ -81,7 +80,16 @@ export default {
     getRandomInt(min, max) {
       min = Math.ceil(min);
       max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+      return Math.floor(Math.random() * (max - min) + min);
+    },
+    occupied(r, c) {
+      for (let user of this.users) {
+        let { row, col } = user.square
+        if (row === r && col == c) {
+          return true
+        }
+      }
+      return false
     }
   },
 }
