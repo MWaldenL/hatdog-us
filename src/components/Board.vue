@@ -12,15 +12,15 @@
 <script>
 import Square from './Square'
 import PlayerRepository from '@/model/repository/playerRepository'
+import BoardHelper from '@/helpers/BoardHelper'
 import { playersRef } from '@/firebase'
+
 export default {
   created() {
     window.addEventListener('keydown', e => this.move(e.key))
     this.row = this.startRow
     this.col = this.startCol
-    playersRef.on('value', () => {
-      this.showPlayers()
-    })
+    playersRef.on('value', () => this.showPlayers())
   },
   data() {
     return {
@@ -45,53 +45,23 @@ export default {
     hasPiece(square) {
       return square == 'o'
     },
+    
+    move(direction) {
+      const newSquare = BoardHelper.move(direction, this.board, this.row, this.col)
+      this.row = newSquare.row
+      this.col = newSquare.col
+      this.updatePos()
+    },
+
     updatePos() {
       PlayerRepository.updatePlayer(this.playerID, 'square', {
         'row': this.row,
         'col': this.col
       })
     },
-    move(direction) {
-      let newRow, newCol
-      switch(direction) {
-        case 'ArrowUp':
-          newRow = Math.max(this.row-1, 0)
-          if (this.board[newRow][this.col] === '') {
-            this.row = newRow
-            this.updatePos()
-          }
-          break;
-        case 'ArrowLeft':
-          newCol = Math.max(this.col-1, 0)
-          if (this.board[this.row][newCol] === '') {
-            this.col = newCol
-            this.updatePos();
-          }
-          break;
-        case 'ArrowDown':
-          newRow = Math.min(this.row+1, this.board.length-1); 
-          if (this.board[newRow][this.col] === '') {
-            this.row = newRow
-            this.updatePos();
-          }
-          break;
-        case 'ArrowRight':
-          newCol = Math.min(this.col+1, this.board.length-1);
-          if (this.board[this.row][newCol] === '') {
-            this.col = newCol
-            this.updatePos();
-          }
-          break;
-      }
-    },
+
     showPlayers() {
-      let newBoard = Array.from(Array(15), () => Array(15).fill(''))
-      newBoard[this.row][this.col] = 'o' // this player
-      for (let player of this.players) { // other players
-        let {row, col} = player.square
-        newBoard[row][col] = 'o'
-      }
-      this.board = newBoard
+      this.board = BoardHelper.getBoardWithPlayers(this.players, this.row, this.col)
     }
   }
 }

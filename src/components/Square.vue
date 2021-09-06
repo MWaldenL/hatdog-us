@@ -44,9 +44,4 @@ export default {
   background: radial-gradient(50% 50% at 50% 50%, rgba(48, 48, 48, 0.74) 0%, #424242 100%);
   border: 10px solid #3A3A3A;
 }
-
-.king {
-  height: 40px;
-  width: 40px;
-}
 </style>

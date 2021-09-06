@@ -23,13 +23,10 @@ import { playersRef } from "@/firebase"
 import Player from '@/model/dataobjects/Player'
 import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
-import Helper from '@/helpers/helper'
+import BoardHelper from '@/helpers/BoardHelper'
 import Board from './Board'
 
 export default {
-  created() {
-    PlayerRepository.observeOnlineStatus(this.playerID)
-  },
   data() {
     return {
       name: '',
@@ -64,19 +61,9 @@ export default {
       PlayerRepository.observeOnlineStatus(this.playerID)
     },
     setStartingPos() {
-      do {
-        this.row = Helper.getRandomInt(0, 15)
-        this.col = Helper.getRandomInt(0, 15)
-      } while (this.isOccupied(this.row, this.col))
-    },
-    isOccupied(r, c) {
-      for (let player of this.players) {
-        let { row, col } = player.square
-        if (row === r && col == c) {
-          return true
-        }
-      }
-      return false
+      const square = BoardHelper.getStartingSquare(this.players)
+      this.row = square.row
+      this.col = square.col
     },
   },
 }
