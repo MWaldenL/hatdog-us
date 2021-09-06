@@ -20,7 +20,7 @@ export default class GameHelper {
       col = Helper.getRandomInt(0, 15)
       badSquare = 
         BoardHelper.isSquareOccupied(players, row, col) && 
-        BoardHelper.isMinTwoSquaresApart(players, row, col)
+        !BoardHelper.isMinTwoSquaresApart(players, row, col)
     } while (badSquare)
     return new Square(row, col)
   }
