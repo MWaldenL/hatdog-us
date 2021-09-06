@@ -65,8 +65,32 @@ export default class BoardHelper {
   }
 
   static _isMinTwoSquaresApart(players, row, col) {
-    // TODO: Byron
-    console.log(players, row, col)
+    for (let player of players) {
+      let r = player.row
+      let c = player.col
+      
+      // check vertical
+      if (row === r && _absDiff(c, col) <= 2)
+        return false
+
+      // check horizontal
+      if (col === c && _absDiff(r, row) <= 2)
+        return false
+
+      // check diagonal  
+      if (
+          col === c + 1 && row === r + 1 ||
+          col === c + 1 && row === r - 1 ||
+          col === c - 1 && row === r + 1 ||
+          col === c - 1 && row === r - 1
+      )  
+        return false
+    }
+
     return true 
+  }
+
+  static _absDiff(num1, num2) {
+    return Math.abs(num1 - num2)
   }
 }
