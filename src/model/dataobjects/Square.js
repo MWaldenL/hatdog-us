@@ -2,18 +2,18 @@ export default class Square {
   constructor(row, col, currentPlayers) {
     this.row = row
     this.col = col
-    this.currentPlayers = currentPlayers
+    this.currentPlayers = currentPlayers ? currentPlayers : new Set()
   }
 
   getPlayerCount() {
-    return this.currentPlayers.length
+    return this.currentPlayers.size
   }
 
   addPlayer(playerId) {
-    this.currentPlayers.push(playerId)
+    this.currentPlayers.add(playerId)
   }
 
-  removePlayer() {
-    this.numPlayers = Math.min(0, this.numPlayers-1)
+  removePlayer(playerId) {
+    this.currentPlayers.delete(playerId)
   }
 }

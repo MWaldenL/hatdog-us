@@ -1,4 +1,6 @@
 import BoardHelper from "./BoardHelper"
+import Helper from "./helper"
+import Square from '@/model/dataobjects/Square'
 
 export default class GameHelper {
   static getBoardWithPlayers(selfId, players, selfRow, selfCol) {
@@ -7,19 +9,21 @@ export default class GameHelper {
     for (let player of players) { // set other players
       let {row, col} = player.square
       newBoard[row][col].addPlayer(player['.key'])
+      console.log(newBoard[row][col].currentPlayers)
     }
     return newBoard
   }
 
-  static getStartingSquare(self, players) {
+  static getStartingSquare(players) {
+    console.log("getStaringSq")
     let row = 0, col = 0, badSquare
     do {
       row = Helper.getRandomInt(0, 15)
       col = Helper.getRandomInt(0, 15)
       badSquare = 
-        BoardHelper._isOccupied(players, row, col) && 
-        BoardHelper._isMinTwoSquaresApart(players, row, col)
+        BoardHelper.isSquareOccupied(players, row, col) && 
+        BoardHelper.isMinTwoSquaresApart(players, row, col)
     } while (badSquare)
-    return new Square(row, col, [self.id])
+    return new Square(row, col)
   }
 }

@@ -13,6 +13,7 @@
 import Square from './Square'
 import PlayerRepository from '@/model/repository/playerRepository'
 import BoardHelper from '@/helpers/BoardHelper'
+import GameHelper from '@/helpers/GameHelper'
 import { playersRef } from '@/firebase'
 
 export default {
@@ -48,23 +49,17 @@ export default {
     
     move(direction) {
       const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
-      this.board[this.row][this.col] = newSquare
       this.row = newSquare.row
       this.col = newSquare.col
-      this.updatePos(newSquare)
+      this.updatePos()
     },
 
-    updatePos(newSquare) {
-      console.log(newSquare)
-      PlayerRepository.updatePlayer(this.playerID, 'square', {
-        'row': this.row,
-        'col': this.col,
-        'currentPlayers': newSquare.currentPlayers
-      })
+    updatePos() {
+      PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
     },
 
     showPlayers() {
-      this.board = BoardHelper.getBoardWithPlayers(this.playerID, this.players, this.row, this.col)
+      this.board = GameHelper.getBoardWithPlayers(this.playerID, this.players, this.row, this.col)
     }
   }
 }

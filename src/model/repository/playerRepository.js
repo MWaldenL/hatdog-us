@@ -15,6 +15,10 @@ export default class PlayerRepository {
     db.ref(`players/${id}/${field}`).set(value)
   }
 
+  static updatePlayerSquare(id, row, col) {
+    db.ref(`players/${id}/square`).set({ row, col })
+  }
+
   static removePlayer(id) {
     db.ref(`players/${id}`).remove()
   }
