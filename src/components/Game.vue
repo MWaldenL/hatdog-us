@@ -55,13 +55,13 @@ export default {
         id: this.playerID,
         gameID: 'sample123',
         name: this.name,
-        square: new Square(this.row, this.col),
+        square: new Square(this.row, this.col, 1),
         online: true
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
     },
     setStartingPos() {
-      const square = BoardHelper.getStartingSquare(this.players)
+      const square = BoardHelper.getStartingSquare(this.playerID, this.players)
       this.row = square.row
       this.col = square.col
     },

@@ -2,7 +2,8 @@
 <div id="table">  
   <table>
     <tr v-for="(row, rowInd) in board" :key="rowInd">
-      <Square v-for="(col, colInd) in row" :key="colInd" :hasPiece="hasPiece(col)" />
+      <Square v-for="(col, colInd) in row" :key="colInd" 
+        :hasPiece="hasPiece(col)" />
     </tr>
   </table>
 </div>
@@ -23,7 +24,7 @@ export default {
   },
   data() {
     return {
-      board: Array.from(Array(15), () => Array(15).fill('')),
+      board: BoardHelper.initializeBoard(),
       players: [],
       row: -1,
       col: -1
@@ -42,25 +43,28 @@ export default {
   },
   methods: {
     hasPiece(square) {
-      return square == 'o'
+      return square.getPlayerCount() > 0
     },
     
     move(direction) {
-      const newSquare = BoardHelper.move(direction, this.board, this.row, this.col)
+      const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
+      this.board[this.row][this.col] = newSquare
       this.row = newSquare.row
       this.col = newSquare.col
-      this.updatePos()
+      this.updatePos(newSquare)
     },
 
-    updatePos() {
+    updatePos(newSquare) {
+      console.log(newSquare)
       PlayerRepository.updatePlayer(this.playerID, 'square', {
         'row': this.row,
-        'col': this.col
+        'col': this.col,
+        'currentPlayers': newSquare.currentPlayers
       })
     },
 
     showPlayers() {
-      this.board = BoardHelper.getBoardWithPlayers(this.players, this.row, this.col)
+      this.board = BoardHelper.getBoardWithPlayers(this.playerID, this.players, this.row, this.col)
     }
   }
 }
