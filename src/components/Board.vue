@@ -2,8 +2,7 @@
 <div id="table">  
   <table>
     <tr v-for="(row, rowInd) in board" :key="rowInd">
-      <Square v-for="(col, colInd) in row" :key="colInd" 
-        :hasPiece="hasPiece(col)" />
+      <Square v-for="(col, colInd) in row" :key="colInd" :hasPiece="hasPiece(col)" />
     </tr>
   </table>
 </div>

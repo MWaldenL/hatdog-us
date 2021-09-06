@@ -2,12 +2,17 @@ import Helper from '@/helpers/helper'
 import Square from '@/model/dataobjects/Square'
 
 export default class BoardHelper {
+  static initializeBoard() {
+    return Array.from(Array(15), () => Array(15).fill(new Square()))
+  }
+
   static move(direction, board, row, col) {
-    let res = new Square(row, col), toMove
     const up = ['ArrowUp', 'W', 'w'].includes(direction)
     const down = ['ArrowDown', 'S', 's'].includes(direction)
     const left = ['ArrowLeft', 'A', 'a'].includes(direction)
     const right = ['ArrowRight', 'D', 'd'].includes(direction)
+    let res = new Square(row, col), toMove
+
     if (up) {
       toMove = Math.max(row-1, 0)
       if (board[toMove][col] === '') {

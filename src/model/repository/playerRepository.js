@@ -11,6 +11,10 @@ export default class PlayerRepository {
     })
   }
 
+  static updatePlayer(id, field, value) {
+    db.ref(`players/${id}/${field}`).set(value)
+  }
+
   static removePlayer(id) {
     db.ref(`players/${id}`).remove()
   }
@@ -27,9 +31,5 @@ export default class PlayerRepository {
         statusRef.set(true)
       }
     })
-  }
-
-  static updatePlayer(id, field, value) {
-    db.ref(`players/${id}/${field}`).set(value)
   }
 }
