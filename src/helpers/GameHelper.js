@@ -9,13 +9,11 @@ export default class GameHelper {
     for (let player of players) { // set other players
       let {row, col} = player.square
       newBoard[row][col].addPlayer(player['.key'])
-      console.log(newBoard[row][col].currentPlayers)
     }
     return newBoard
   }
 
   static getStartingSquare(players) {
-    console.log("getStaringSq")
     let row = 0, col = 0, badSquare
     do {
       row = Helper.getRandomInt(0, 15)

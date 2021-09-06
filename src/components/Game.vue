@@ -14,7 +14,12 @@
     <Board 
       :playerID="playerID"
       :startRow="row" 
-      :startCol="col" />
+      :startCol="col"
+      :canMove="canMove"
+      @playerMoved="waitTwoSeconds" />
+    <div id="timer">
+      <h1>Move in: {{ timer }}</h1>
+    </div>
   </div>
 </template>
 
@@ -33,7 +38,9 @@ export default {
       playerID: '',
       players: [],
       row: -1,
-      col: -1
+      col: -1,
+      canMove: true,
+      timer: 2
     }
   },
   firebase: {
@@ -66,6 +73,18 @@ export default {
       this.row = square.row
       this.col = square.col
     },
+
+    waitTwoSeconds() {
+      this.timer = 2
+      this.canMove = false
+      let time = setInterval(() => {
+        this.timer--
+        if (this.timer === 0) {
+          clearInterval(time)
+          this.canMove = true
+        }
+      }, 1000)
+    }
   },
 }
 </script>
