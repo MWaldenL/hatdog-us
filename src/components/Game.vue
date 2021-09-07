@@ -20,6 +20,9 @@
     <div id="timer">
       <h1>Move in: {{ timer }}</h1>
     </div>
+    <div v-if="playerIsHost">
+      You are the host.
+    </div>
   </div>
 </template>
 
@@ -52,16 +55,25 @@ export default {
   computed: {
     entered() {
       return this.playerID.length > 0
-    }
+    },
+
+    playerIsHost() {
+      console.log("Player id = " + this.playerID)
+      for (let player of this.players) {
+        console.log("Checking if host " + player.id + ": " + player.host)
+        if (player.id === this.playerID && player.host)
+          return true
+      }
+      return false
+    },
   },
+
   methods: {
-    enterGame() {
+    async enterGame() {
       this.playerID = Date.now().toString()
       this.setStartingPos()
 
-      console.log("host exists: " + this.hostExists())
-
-      PlayerRepository.addPlayer(new Player({
+      await PlayerRepository.addPlayer(new Player({
         id: this.playerID,
         gameID: 'sample123',
         name: this.name,
@@ -73,17 +85,8 @@ export default {
       console.log(this.players)
     },
 
-    /* getHost() {
-      this.players.forEach(element => {
-        if (element.host)
-          return element
-      });
-    }, */
-
     hostExists() {
-      console.log("Player ct: " + this.players.length)
       for (let player of this.players) {
-        console.log("Checking player " + player.name + ": " + player.host)
         if (player.host)
           return true
       }
