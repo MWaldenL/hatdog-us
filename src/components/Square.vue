@@ -1,5 +1,5 @@
 <template>
-<td class="square light">
+<td class="square" :class="{ light: !isWall, dark: isWall }">
   <div id="checker-black" class="chip black-chip" v-show="hasPiece" />
 </td>
 </template>
@@ -9,7 +9,8 @@ export default {
   props: {
     hasPiece: Boolean,
     row: Number,
-    col: Number
+    col: Number,
+    isWall: Boolean
   },
 }
 </script>

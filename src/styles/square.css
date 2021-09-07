@@ -9,6 +9,10 @@
   background-color: #ebecd0;
 }
 
+.dark {
+  background-color: #000000;
+}
+
 .chip {
   position: absolute;
   z-index: 2;
