@@ -1,60 +1,41 @@
-import Helper from '@/helpers/helper'
 import Square from '@/model/dataobjects/Square'
 
 export default class BoardHelper {
-  static move(direction, board, row, col) {
-    let res = new Square(row, col), toMove
-    const up = ['ArrowUp', 'W', 'w'].includes(direction)
-    const down = ['ArrowDown', 'S', 's'].includes(direction)
-    const left = ['ArrowLeft', 'A', 'a'].includes(direction)
-    const right = ['ArrowRight', 'D', 'd'].includes(direction)
-    if (up) {
-      toMove = Math.max(row-1, 0)
-      if (board[toMove][col] === '') {
-        res = new Square(toMove, col)
-      }
-    } else if (left) {
-      toMove = Math.max(col-1, 0)
-      if (board[row][toMove] === '') {
-        res = new Square(row, toMove)
-      }
-    } else if (down) {
-      toMove = Math.min(row+1, board.length-1)
-      if (board[toMove][col] === '') {
-        res = new Square(toMove, col)
-      }
-    } else if (right) {
-      toMove = Math.min(col+1, board.length-1)
-      if (board[row][toMove] === '') {
-        res = new Square(row, toMove)
+  static initializeBoard() {
+    let res = []
+    for (let i=0; i < 16; i++) {
+      res.push([])
+    }
+    for (let i=0; i < 16; i++) {
+      for (let j=0; j < 16; j++) {
+        res[i][j] = new Square(i, j)
       }
     }
     return res
   }
 
-  static getBoardWithPlayers(players, thisRow, thisCol) {
-    let newBoard = Array.from(Array(15), () => Array(15).fill(''))
-    newBoard[thisRow][thisCol] = 'o' // this player
-    for (let player of players) { // other players
-      let {row, col} = player.square
-      newBoard[row][col] = 'o'
-    }
-    return newBoard
+  static move(player, direction, board, row, col) {
+    const up = ['ArrowUp', 'W', 'w'].includes(direction)
+    const down = ['ArrowDown', 'S', 's'].includes(direction)
+    const left = ['ArrowLeft', 'A', 'a'].includes(direction)
+    const right = ['ArrowRight', 'D', 'd'].includes(direction)
+    let res = new Square(row, col), toMove
+
+    if (up || down) {
+      toMove = up ? Math.max(row-1, 0) : Math.min(row+1, board.length-1)
+      if (this._squareHasMaxOnePlayer(board, toMove, col)) {
+        res = new Square(toMove, col) // save new square object to be received
+      }
+    } else if (left || right) {
+      toMove = left ? Math.max(col-1, 0) : Math.min(col+1, board.length-1)
+      if (this._squareHasMaxOnePlayer(board, row, toMove)) {
+        res = new Square(row, toMove)
+      }
+    } 
+    return res
   }
 
-  static getStartingSquare(players) {
-    let row = 0, col = 0, badSquare
-    do {
-      row = Helper.getRandomInt(0, 15)
-      col = Helper.getRandomInt(0, 15)
-      badSquare = 
-        this._isOccupied(players, row, col) && 
-        this._isMinTwoSquaresApart(players, row, col)
-    } while (badSquare)
-    return new Square(row, col)
-  }
-
-  static _isOccupied(players, row, col) {
+  static isSquareOccupied(players, row, col) {
     for (let player of players) {
       let { r, c } = player.square
       if (row === r && col == c) {
@@ -64,17 +45,17 @@ export default class BoardHelper {
     return false
   }
 
-  static _isMinTwoSquaresApart(players, row, col) {
+  static isMinTwoSquaresApart(players, row, col) {
     for (let player of players) {
       let r = player.row
       let c = player.col
       
       // check vertical
-      if (row === r && _absDiff(c, col) <= 2)
+      if (row === r && this._absDiff(c, col) <= 2)
         return false
 
       // check horizontal
-      if (col === c && _absDiff(r, row) <= 2)
+      if (col === c && this._absDiff(r, row) <= 2)
         return false
 
       // check diagonal  
@@ -86,8 +67,11 @@ export default class BoardHelper {
       )  
         return false
     }
-
     return true 
+  }
+  
+  static _squareHasMaxOnePlayer(board, row, col) {
+    return board[row][col].getPlayerCount() <= 1
   }
 
   static _absDiff(num1, num2) {

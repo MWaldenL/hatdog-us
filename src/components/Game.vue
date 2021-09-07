@@ -14,7 +14,12 @@
     <Board 
       :playerID="playerID"
       :startRow="row" 
-      :startCol="col" />
+      :startCol="col"
+      :canMove="canMove"
+      @playerMoved="waitTwoSeconds" />
+    <div id="timer">
+      <h1>Move in: {{ timer }}</h1>
+    </div>
   </div>
 </template>
 
@@ -23,7 +28,7 @@ import { playersRef } from "@/firebase"
 import Player from '@/model/dataobjects/Player'
 import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
-import BoardHelper from '@/helpers/BoardHelper'
+import GameHelper from '@/helpers/GameHelper'
 import Board from './Board'
 
 export default {
@@ -33,7 +38,9 @@ export default {
       playerID: '',
       players: [],
       row: -1,
-      col: -1
+      col: -1,
+      canMove: true,
+      timer: 2
     }
   },
   firebase: {
@@ -60,11 +67,24 @@ export default {
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
     },
+
     setStartingPos() {
-      const square = BoardHelper.getStartingSquare(this.players)
+      const square = GameHelper.getStartingSquare(this.players)
       this.row = square.row
       this.col = square.col
     },
+
+    waitTwoSeconds() {
+      this.timer = 2
+      this.canMove = false
+      let time = setInterval(() => {
+        this.timer--
+        if (this.timer === 0) {
+          clearInterval(time)
+          this.canMove = true
+        }
+      }, 1000)
+    }
   },
 }
 </script>

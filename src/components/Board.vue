@@ -13,18 +13,21 @@
 import Square from './Square'
 import PlayerRepository from '@/model/repository/playerRepository'
 import BoardHelper from '@/helpers/BoardHelper'
+import GameHelper from '@/helpers/GameHelper'
 import { playersRef } from '@/firebase'
 
 export default {
   created() {
-    window.addEventListener('keydown', e => this.move(e.key))
+    window.addEventListener('keydown', e => {
+      this.move(e.key)
+    })
     this.row = this.startRow
     this.col = this.startCol
     playersRef.on('value', () => this.showPlayers())
   },
   data() {
     return {
-      board: Array.from(Array(15), () => Array(15).fill('')),
+      board: BoardHelper.initializeBoard(),
       players: [],
       row: -1,
       col: -1
@@ -39,29 +42,26 @@ export default {
   props: {
     playerID: String,
     startRow: Number,
-    startCol: Number
+    startCol: Number,
+    canMove: Boolean
   },
   methods: {
     hasPiece(square) {
-      return square == 'o'
+      return square.getPlayerCount() > 0
     },
     
     move(direction) {
-      const newSquare = BoardHelper.move(direction, this.board, this.row, this.col)
-      this.row = newSquare.row
-      this.col = newSquare.col
-      this.updatePos()
-    },
-
-    updatePos() {
-      PlayerRepository.updatePlayer(this.playerID, 'square', {
-        'row': this.row,
-        'col': this.col
-      })
+      if (this.canMove) {
+        const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
+        this.row = newSquare.row
+        this.col = newSquare.col
+        PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
+        this.$emit('playerMoved')
+      }
     },
 
     showPlayers() {
-      this.board = BoardHelper.getBoardWithPlayers(this.players, this.row, this.col)
+      this.board = GameHelper.getBoardWithPlayers(this.playerID, this.players, this.row, this.col)
     }
   }
 }
