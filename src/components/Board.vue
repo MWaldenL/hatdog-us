@@ -3,7 +3,8 @@
   <table>
     <tr v-for="(row, rowInd) in board" :key="rowInd">
       <Square v-for="(col, colInd) in row" :key="colInd" 
-        :hasPiece="hasPiece(col)" />
+        :hasPiece="hasPiece(col)"
+        :isWall="isWall(col)" />
     </tr>
   </table>
 </div>
@@ -49,14 +50,23 @@ export default {
     hasPiece(square) {
       return square.getPlayerCount() > 0
     },
+
+    isWall(square) {
+      return square.isWall
+    },
     
     move(direction) {
       if (this.canMove) {
         const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
-        this.row = newSquare.row
-        this.col = newSquare.col
-        PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
-        this.$emit('playerMoved')
+
+        if (!newSquare.isWall) {
+          this.row = newSquare.row
+          this.col = newSquare.col
+          PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
+          this.$emit('playerMoved')
+        } else {
+          alert("can't move")
+        }
       }
     },
 
