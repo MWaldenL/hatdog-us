@@ -58,14 +58,36 @@ export default {
     enterGame() {
       this.playerID = Date.now().toString()
       this.setStartingPos()
+
+      console.log("host exists: " + this.hostExists())
+
       PlayerRepository.addPlayer(new Player({
         id: this.playerID,
         gameID: 'sample123',
         name: this.name,
         square: new Square(this.row, this.col),
-        online: true
+        online: true,
+        host: !this.hostExists()
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
+      console.log(this.players)
+    },
+
+    /* getHost() {
+      this.players.forEach(element => {
+        if (element.host)
+          return element
+      });
+    }, */
+
+    hostExists() {
+      console.log("Player ct: " + this.players.length)
+      for (let player of this.players) {
+        console.log("Checking player " + player.name + ": " + player.host)
+        if (player.host)
+          return true
+      }
+      return false
     },
 
     setStartingPos() {
