@@ -50,6 +50,18 @@ import Board from './Board'
 import _ from 'underscore'
 
 export default {
+  created() {
+    playersRef.on('value', (snapshot) => {
+      const data = snapshot.val()
+      console.log(data)
+        for (let player of data) {
+          if (player.host) {
+            this.hostExists = true
+            break
+          }
+        }
+    })
+  },
   data() {
     return {
       name: '',
@@ -60,7 +72,10 @@ export default {
       row: -1,
       col: -1,
       canMove: true,
-      timer: 2
+      timer: 2,
+
+
+      hostExists: false
     }
   },
   firebase: {
@@ -75,12 +90,12 @@ export default {
       return this.playerID.length > 0
     },
 
-    hostExists() {
-      for (let player of this.players)
-        if (player.host)
-          return true
-      return false
-    },
+    // hostExists() {
+    //   for (let player of this.players)
+    //     if (player.host)
+    //       return true
+    //   return false
+    // },
 
     minPlayersReached() {
       return this.players.length >= 4 // TODO: change to 4 (minimum)
@@ -96,9 +111,26 @@ export default {
   },
 
   methods: {
+    checkHost() {
+      db.ref(`players`)
+
+      
+      .get().then(s => {
+        const data = s.val()
+        console.log(data)
+        for (let player of data) {
+          if (player.host) {
+            this.hostExists = true
+            break
+          }
+        }
+      })
+    },
+
     async enterGame() {
       this.playerID = Date.now().toString()
       this.setStartingPos()
+      this.checkHost()
 
       await PlayerRepository.addPlayer(new Player({
         id: this.playerID,
