@@ -87,7 +87,7 @@ export default {
     },
 
     lobbyIsFull() {
-      return this.players.length == 2
+      return this.players.length == 2 // TODO: change to 10 (max)
     }
   },
 
