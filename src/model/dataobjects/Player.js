@@ -5,6 +5,7 @@ export default class Player {
     this.name = name
     this.square = square 
     this.online = online 
-    this.host = host
+    this.host = host,
+    this.infected = false
   }
 }

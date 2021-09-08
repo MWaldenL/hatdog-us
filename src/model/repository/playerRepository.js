@@ -2,14 +2,15 @@ import { db } from '@/firebase'
 
 export default class PlayerRepository {
   static addPlayer(p) {
-    const { id, gameID, name, square, online, host } = p
+    const { id, gameID, name, square, online, host, infected } = p
     db.ref(`players/${id}`).set({
       id,
       gameID, 
       name,
       square,
       online,
-      host
+      host,
+      infected
     })
   }
 

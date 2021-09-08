@@ -25,8 +25,8 @@
       <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
     </div>
 
-    <div v-if="game.gameStarted">
-      Game has started
+    <div v-if="game && game.gameStarted">
+      Game has started.
     </div>
 
   </div>
@@ -41,6 +41,7 @@ import PlayerRepository from '@/model/repository/playerRepository'
 import GameRepository from '@/model/repository/gameRepository'
 import GameHelper from '@/helpers/GameHelper'
 import Board from './Board'
+import _ from 'underscore'
 
 export default {
   data() {
@@ -48,6 +49,7 @@ export default {
       name: '',
       playerID: '',
       players: [],
+      game: null,
       row: -1,
       col: -1,
       canMove: true,
@@ -109,6 +111,16 @@ export default {
     startGame() {
       this.canMove = true
       GameRepository.startGame()
+
+      let sampleSize = 0
+      if (this.players.length >= 4 && this.players.length <= 6)
+        sampleSize = 2
+      else if (this.players.length >= 7 && this.players.length <= 10)
+        sampleSize = 3
+
+      let randomPlayers = _.sample(this.players, sampleSize)
+      for (let p of randomPlayers)
+        PlayerRepository.updatePlayer(p.id, "infected", true)
     },
 
     setStartingPos() {
