@@ -15,7 +15,7 @@ import Square from './Square'
 import PlayerRepository from '@/model/repository/playerRepository'
 import BoardHelper from '@/helpers/BoardHelper'
 import GameHelper from '@/helpers/GameHelper'
-import { playersRef } from '@/firebase'
+import { playersRef, gameRef } from '@/firebase'
 
 export default {
   created() {
@@ -36,6 +36,7 @@ export default {
   },
   firebase: {
     players: playersRef,
+    game: gameRef
   },
   components: {
     Square
@@ -56,7 +57,7 @@ export default {
     },
     
     move(direction) {
-      if (this.canMove) {
+      if (this.canMove && this.game.gameStarted) {
         const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
 
         if (!newSquare.isWall) {

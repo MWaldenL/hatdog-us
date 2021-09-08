@@ -26,4 +26,5 @@ const db = firebase.initializeApp({
 // }).database()
 
 const playersRef = db.ref(`players`)
-export { db, playersRef }
+const gameRef = db.ref(`game`)
+export { db, playersRef, gameRef }

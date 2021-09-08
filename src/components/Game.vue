@@ -6,7 +6,7 @@
   </div>
   <div id="home" v-else>
     <div id="playerList">
-      <h1>players:</h1> 
+      <h1>Players ({{players.length}}):</h1> 
       <ul v-for="player in players" :key="player.id">
         <li v-if="player.online">{{ player.name }}</li>
       </ul>
@@ -20,17 +20,25 @@
     <div id="timer">
       <h1>Move in: {{ timer }}</h1>
     </div>
-    <div v-if="playerIsHost">
-      You are the host.
+    <div v-if="playerIsHost && !game.gameStarted">
+      <div>You are the host.</div>
+      <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
     </div>
+
+    <div v-if="game.gameStarted">
+      Game has started
+    </div>
+
   </div>
 </template>
 
 <script>
 import { playersRef } from "@/firebase"
+import { gameRef } from "@/firebase"
 import Player from '@/model/dataobjects/Player'
 import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
+import GameRepository from '@/model/repository/gameRepository'
 import GameHelper from '@/helpers/GameHelper'
 import Board from './Board'
 
@@ -47,7 +55,8 @@ export default {
     }
   },
   firebase: {
-    players: playersRef
+    players: playersRef,
+    game: gameRef
   },
   components: {
     Board
@@ -66,6 +75,18 @@ export default {
       }
       return false
     },
+
+    hostExists() {
+      for (let player of this.players) {
+        if (player.host)
+          return true
+      }
+      return false
+    },
+
+    minPlayersReached() {
+      return this.players.length >= 1 // TODO: change to 4
+    },
   },
 
   methods: {
@@ -79,18 +100,15 @@ export default {
         name: this.name,
         square: new Square(this.row, this.col),
         online: true,
-        host: !this.hostExists()
+        host: !this.hostExists
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
-      console.log(this.players)
+      GameRepository.initGame()
     },
 
-    hostExists() {
-      for (let player of this.players) {
-        if (player.host)
-          return true
-      }
-      return false
+    startGame() {
+      this.canMove = true
+      GameRepository.startGame()
     },
 
     setStartingPos() {
@@ -100,15 +118,17 @@ export default {
     },
 
     waitTwoSeconds() {
-      this.timer = 2
-      this.canMove = false
-      let time = setInterval(() => {
-        this.timer--
-        if (this.timer === 0) {
-          clearInterval(time)
-          this.canMove = true
-        }
-      }, 1000)
+      if (this.game.gameStarted) {
+        this.timer = 2
+        this.canMove = false
+        let time = setInterval(() => {
+          this.timer--
+          if (this.timer === 0) {
+            clearInterval(time)
+            this.canMove = true
+          }
+        }, 1000)
+      }
     }
   },
 }
