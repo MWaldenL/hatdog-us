@@ -20,7 +20,7 @@
     <div id="timer">
       <h1>Move in: {{ timer }}</h1>
     </div>
-    <div v-if="player && game && player.host && !game.gameStarted">
+    <div v-if="playerIsHost">
       <div>You are the host.</div>
       <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
     </div>
@@ -87,16 +87,20 @@ export default {
     },
 
     lobbyIsFull() {
-      return this.players.length == 10 // TODO: change to 10 (max)
+      return this.players.length === 10 // TODO: change to 10 (max)
+    },
+
+    playerIsHost() {
+      return this.player && this.game && this.player.host && !this.game.gameStarted
     }
   },
 
   methods: {
-    enterGame() {
+    async enterGame() {
       this.playerID = Date.now().toString()
       this.setStartingPos()
 
-      PlayerRepository.addPlayer(new Player({
+      await PlayerRepository.addPlayer(new Player({
         id: this.playerID,
         gameID: 'sample123',
         name: this.name,
@@ -105,9 +109,9 @@ export default {
         host: !this.hostExists
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
-      GameRepository.initGame()
+      await GameRepository.initGame()
 
-      db.ref(`players/${this.playerID}`).on("value", (snapshot) => {
+      await db.ref(`players/${this.playerID}`).on("value", (snapshot) => {
         this.player = snapshot.val()
       })
     },
