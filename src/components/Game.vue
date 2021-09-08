@@ -2,13 +2,13 @@
   <div id="entryForm" v-if="!entered">
     <h1>Enter Name:</h1> 
     <input type="text" @keyup.enter="enterGame" v-model="name" />
-    <button @click="enterGame">Play</button>
+    <button :disabled="lobbyIsFull" @click="enterGame">Play</button>
   </div>
   <div id="home" v-else>
     <div id="playerList">
       <h1>Players ({{players.length}}):</h1> 
-      <ul v-for="player in players" :key="player.id">
-        <li v-if="player.online">{{ player.name }}</li>
+      <ul v-for="p in players" :key="p.id">
+        <li v-if="p.online">{{ p.name }}</li>
       </ul>
     </div>
     <Board 
@@ -20,21 +20,27 @@
     <div id="timer">
       <h1>Move in: {{ timer }}</h1>
     </div>
-    <div v-if="playerIsHost && !game.gameStarted">
+    <div v-if="player && game && player.host && !game.gameStarted">
       <div>You are the host.</div>
       <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
     </div>
 
+    <!-- TODO: FIX UI -->
     <div v-if="game && game.gameStarted">
       Game has started.
+      <div v-if="player && player.infected">
+        You are infected.
+      </div>
+      <div v-else>
+        You are clean.
+      </div>
     </div>
 
   </div>
 </template>
 
 <script>
-import { playersRef } from "@/firebase"
-import { gameRef } from "@/firebase"
+import { db, playersRef, gameRef } from "@/firebase"
 import Player from '@/model/dataobjects/Player'
 import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
@@ -48,6 +54,7 @@ export default {
     return {
       name: '',
       playerID: '',
+      player: null,
       players: [],
       game: null,
       row: -1,
@@ -68,35 +75,28 @@ export default {
       return this.playerID.length > 0
     },
 
-    playerIsHost() {
-      console.log("Player id = " + this.playerID)
-      for (let player of this.players) {
-        console.log("Checking if host " + player.id + ": " + player.host)
-        if (player.id === this.playerID && player.host)
-          return true
-      }
-      return false
-    },
-
     hostExists() {
-      for (let player of this.players) {
+      for (let player of this.players)
         if (player.host)
           return true
-      }
       return false
     },
 
     minPlayersReached() {
-      return this.players.length >= 1 // TODO: change to 4
+      return this.players.length >= 1 // TODO: change to 4 (minimum)
     },
+
+    lobbyIsFull() {
+      return this.players.length == 2
+    }
   },
 
   methods: {
-    async enterGame() {
+    enterGame() {
       this.playerID = Date.now().toString()
       this.setStartingPos()
 
-      await PlayerRepository.addPlayer(new Player({
+      PlayerRepository.addPlayer(new Player({
         id: this.playerID,
         gameID: 'sample123',
         name: this.name,
@@ -106,18 +106,22 @@ export default {
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
       GameRepository.initGame()
+
+      db.ref(`players/${this.playerID}`).on("value", (snapshot) => {
+        this.player = snapshot.val()
+      })
     },
 
     startGame() {
       this.canMove = true
       GameRepository.startGame()
-
+      
+      // randomly select players to set as infected
       let sampleSize = 0
       if (this.players.length >= 4 && this.players.length <= 6)
         sampleSize = 2
       else if (this.players.length >= 7 && this.players.length <= 10)
         sampleSize = 3
-
       let randomPlayers = _.sample(this.players, sampleSize)
       for (let p of randomPlayers)
         PlayerRepository.updatePlayer(p.id, "infected", true)

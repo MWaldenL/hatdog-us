@@ -18,5 +18,5 @@ export default class PlayerRepository {
   static startGame() {
     const gameStarted = true
     db.ref(`game`).set({gameStarted})
-  } 
+  }
 }
