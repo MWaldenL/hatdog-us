@@ -6,6 +6,9 @@
   </div>
   <div id="home" v-else>
     <div id="playerList">
+      <h1>Team Count</h1>
+      <p>Clean: {{cleanCount}}</p>
+      <p>Infected: {{infectedCount}}</p>
       <h1>Players ({{players.length}}):</h1> 
       <ul v-for="p in players" :key="p.id">
         <li v-if="p.online">{{ p.name }}</li>
@@ -70,7 +73,9 @@ export default {
       dialogMessage: '',
       dialogTimer: 0,
       forceMoveTimer: 0,
-      hasMovedAfterContact: false
+      hasMovedAfterContact: false,
+      cleanCount: 0,
+      infectedCount: 0
     }
   },
   firebase: {
@@ -122,18 +127,21 @@ export default {
         this.player = snapshot.val()
 
         // Check if player is currently in contact with another player
-        if (this.player.inContact) {
-          console.log(this.player)
+        if (this.player.contactInfo.inContact) {
           this.showDialog()
-          PlayerRepository.updatePlayer(this.player.id, "inContact", false)
+          PlayerRepository.updatePlayerContactInfo(this.playerID, false, false, false, '')
         }
 
+      })
+
+      gameRef.on("value", (snapshot) => {
+        this.cleanCount = snapshot.val().cleanCount
+        this.infectedCount = snapshot.val().infectedCount
       })
     },
 
     startGame() {
       this.canMove = true
-      GameRepository.startGame()
       
       // randomly select players to set as infected
       let sampleSize = 0
@@ -144,6 +152,7 @@ export default {
       let randomPlayers = _.sample(this.players, sampleSize)
       for (let p of randomPlayers)
         PlayerRepository.updatePlayer(p.id, "infected", true)
+      GameRepository.startGame(this.players.length - sampleSize, sampleSize)
     },
 
     setStartingPos() {
@@ -155,27 +164,28 @@ export default {
     waitTwoSeconds() {
       if (this.game.gameStarted) {
         this.hasMovedAfterContact = true //used in forced move
-        // this.timer = 2
-        // this.canMove = false
-        // let time = setInterval(() => {
-        //   this.timer--
-        //   if (this.timer <= 0) {
-        //     clearInterval(time)
-        //     this.canMove = true
-        //   }
-        // }, 1000)
+        this.timer = 2
+        this.canMove = false
+        let time = setInterval(() => {
+          this.timer--
+          if (this.timer === 0) {
+            clearInterval(time)
+            this.canMove = true
+          }
+        }, 1000)
       }
     },
 
     showDialog() {
       if (this.game.gameStarted) {
-        let status = this.player.infected ? 'infected' : 'cleaned'
-        this.dialogMessage = this.player.contactWithAlly ? 'You are on the same team.' : `You have been ${status}.`
+        this.dialogMessage = GameHelper.generateDialogMessage(this.player)
         this.dialogOpen = true
         this.canMove = false
         this.dialogTimer = 5
+        this.timer = 5
         let time = setInterval(() => {
           this.dialogTimer--
+          this.timer--
           if (this.dialogTimer === 0) {
             clearInterval(time)
             this.dialogOpen = false
@@ -190,7 +200,7 @@ export default {
       this.canMove = true
 
       if (this.game.gameStarted) {
-        this.forceMoveTimer = this.player.contactWithAlly ? 2 : 3
+        this.forceMoveTimer = this.player.contactInfo.withAlly ? 2 : 3
         
         let time = setInterval(() => {
           this.forceMoveTimer--
@@ -198,6 +208,10 @@ export default {
             if (!this.hasMovedAfterContact) {
               this.$refs.boardRef.randomMove();
             }
+            clearInterval(time)
+          }
+          if (this.hasMovedAfterContact) {
+            this.forceMoveTimer = 0
             clearInterval(time)
           }
         }, 1000)

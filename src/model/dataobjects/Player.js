@@ -7,8 +7,12 @@ export default class Player {
     this.online = online 
     this.host = host
     this.infected = false
-    this.inContact = false
-    this.contactWithAlly = false
+    this.contactInfo = {
+      inContact: false,   //if player is currently in contact with other player
+      withAlly: false,    //if the other player is an ally
+      isReceiver: false,  //if the player (self) is a receiver
+      otherName: ''       //name of the other player
+    }
     // TODO: save initial infected state
   }
 }

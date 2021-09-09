@@ -3,6 +3,7 @@ import Helper from "./helper"
 import Square from '@/model/dataobjects/Square'
 import { playersRef } from '@/firebase'
 import PlayerRepository from "../model/repository/playerRepository"
+import GameRepository from "../model/repository/gameRepository"
 
 export default class GameHelper {
 
@@ -38,28 +39,54 @@ export default class GameHelper {
   static simulateContactInteraction(selfId, otherPlayerId) {
   
     playersRef.once("value").then((snapshot) => {            
-      let selfInfected = snapshot.val()[selfId].infected
-      let otherPlayerInfected = snapshot.val()[otherPlayerId].infected
-      if (selfInfected === otherPlayerInfected) {        
-        PlayerRepository.updatePlayer(selfId, "contactWithAlly", true)                
-        PlayerRepository.updatePlayer(otherPlayerId, "contactWithAlly", true)
+      let self = snapshot.val()[selfId]
+      let other = snapshot.val()[otherPlayerId]
+      if (self.infected === other.infected) {        
+        PlayerRepository.updatePlayerContactInfo(selfId, true, true, false, other.name)
+        PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, true, false, self.name)
       }
       else {
-        PlayerRepository.updatePlayer(selfId, "contactWithAlly", false)                
-        PlayerRepository.updatePlayer(otherPlayerId, "contactWithAlly", false)
-
         let tossCoin = Math.floor(Math.random() * 2)
         if (tossCoin === 0) {
-          selfInfected = !selfInfected
-          PlayerRepository.updatePlayer(selfId, "infected", selfInfected) 
+          let isInfected = !self.infected
+          PlayerRepository.updatePlayer(selfId, "infected", isInfected) 
+          PlayerRepository.updatePlayerContactInfo(selfId, true, false, true, other.name)
+          PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, false, false, self.name)
+
+          if (isInfected)
+            GameRepository.incrementInfected()
+          else
+            GameRepository.incrementClean()
         } 
         else {
-          otherPlayerInfected = !otherPlayerInfected
-          PlayerRepository.updatePlayer(otherPlayerId, "infected", otherPlayerInfected) 
+          let isInfected = !other.infected
+          PlayerRepository.updatePlayer(otherPlayerId, "infected", isInfected)
+          PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, false, true, self.name)
+          PlayerRepository.updatePlayerContactInfo(selfId, true, false, false, other.name)
+          if (isInfected)
+            GameRepository.incrementInfected()
+          else
+            GameRepository.incrementClean()
         }
       }
-      PlayerRepository.updatePlayer(selfId, "inContact", true)
-      PlayerRepository.updatePlayer(otherPlayerId, "inContact", true)
     })
+  }
+
+  static generateDialogMessage(player) {
+    let res
+    let status = player.infected ? 'infected' : 'cleaned'
+    
+    if (player.contactInfo.withAlly) {
+      res = `You are on the same team with ${player.contactInfo.otherName}.`
+    }
+    else {
+      if (player.contactInfo.isReceiver) {
+        res = `You have been ${status} by ${player.contactInfo.otherName}`
+      }
+      else {
+        res = `You have ${status} ${player.contactInfo.otherName}`
+      }
+    }
+    return res
   }
 }
