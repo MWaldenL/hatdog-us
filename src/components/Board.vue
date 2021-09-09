@@ -20,7 +20,8 @@ import { playersRef, gameRef } from '@/firebase'
 export default {
   created() {
     window.addEventListener('keydown', e => {
-      this.move(e.key)
+      if (GameHelper.keys.includes(e.key))
+        this.move(e.key)
     })
     this.row = this.startRow
     this.col = this.startCol
@@ -64,8 +65,16 @@ export default {
           this.row = newSquare.row
           this.col = newSquare.col
           PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
-          this.$emit('playerMoved')
-        } else {
+
+          if (BoardHelper.getPlayerCountInSquare(this.board, this.row, this.col) === 2) {
+            let otherPlayerID = BoardHelper.getOtherPlayerInSquare(this.playerID, this.board, this.row, this.col)
+            GameHelper.simulateContactInteraction(this.playerID, otherPlayerID)
+          }
+          else {
+            this.$emit('playerMoved')
+          }
+        } 
+        else {
           alert("can't move")
         }
       }
@@ -73,7 +82,29 @@ export default {
 
     showPlayers() {
       this.board = GameHelper.getBoardWithPlayers(this.playerID, this.players, this.row, this.col)
+    },
+
+    randomMove() {
+        let direction = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+        let randInd, newSquare
+        do {
+          randInd = Math.floor(Math.random() * direction.length)
+          newSquare = BoardHelper.move(this.playerID, direction[randInd], this.board, this.row, this.col)
+        }
+        while (newSquare.isWall)
+
+        this.row = newSquare.row
+        this.col = newSquare.col
+        PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
+        if (BoardHelper.getPlayerCountInSquare(this.board, this.row, this.col) === 2) {
+            let otherPlayerID = BoardHelper.getOtherPlayerInSquare(this.playerID, this.board, this.row, this.col)
+            GameHelper.simulateContactInteraction(this.playerID, otherPlayerID)
+          }
+          else {
+            this.$emit('playerMoved')
+          }
     }
   }
 }
+
 </script>

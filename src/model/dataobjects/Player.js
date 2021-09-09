@@ -7,6 +7,8 @@ export default class Player {
     this.online = online 
     this.host = host
     this.infected = false
+    this.inContact = false
+    this.contactWithAlly = false
     // TODO: save initial infected state
   }
 }

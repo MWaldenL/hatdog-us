@@ -1,6 +1,6 @@
 import { db } from '@/firebase'
 
-export default class PlayerRepository {
+export default class GameRepository {
   static initGame() {
     db.ref(`game`).on("value", snapshot => {
       if (!snapshot.exists()) {

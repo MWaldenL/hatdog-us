@@ -69,6 +69,16 @@ export default class BoardHelper {
     }
     return true 
   }
+
+  static getOtherPlayerInSquare(selfId, board, row, col) {
+    let playersSet = board[row][col].currentPlayers
+    let playerArr = [...playersSet].filter(id => id !== selfId)
+    return playerArr[0]
+  }
+
+  static getPlayerCountInSquare(board, row, col) {
+    return board[row][col].getPlayerCount()
+  }
   
   static _squareHasMaxOnePlayer(board, row, col) {
     return board[row][col].getPlayerCount() <= 1
