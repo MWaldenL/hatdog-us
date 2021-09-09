@@ -19,9 +19,7 @@ import { playersRef, gameRef } from '@/firebase'
 
 export default {
   created() {
-    window.addEventListener('keydown', e => {
-      this.move(e.key)
-    })
+    window.addEventListener('keydown', e => this.move(e.key))
     this.row = this.startRow
     this.col = this.startCol
     playersRef.on('value', () => this.showPlayers())
@@ -30,18 +28,25 @@ export default {
     return {
       board: BoardHelper.initializeBoard(),
       players: [],
+      game: [],
       row: -1,
       col: -1
     }
   },
   firebase: {
     players: playersRef,
-    game: gameRef
+    games: gameRef
   },
   components: {
     Square
   },
+  computed: {
+    playersInGame() {
+      return this.players.filter(player => player.gameID === this.gameID)
+    }
+  },
   props: {
+    gameID: String,
     playerID: String,
     startRow: Number,
     startCol: Number,
@@ -59,7 +64,6 @@ export default {
     move(direction) {
       if (this.canMove && this.game.gameStarted) {
         const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
-
         if (!newSquare.isWall) {
           this.row = newSquare.row
           this.col = newSquare.col
@@ -72,7 +76,12 @@ export default {
     },
 
     showPlayers() {
-      this.board = GameHelper.getBoardWithPlayers(this.playerID, this.players, this.row, this.col)
+      this.board = GameHelper
+        .getBoardWithPlayers(
+          this.playerID, 
+          this.playersInGame, 
+          this.row, 
+          this.col)
     }
   }
 }
