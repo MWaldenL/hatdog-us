@@ -1,14 +1,9 @@
 export default class Square {
-  constructor(row, col, currentPlayers) {
+  constructor(row, col, isWall, currentPlayers) {
     this.row = row
     this.col = col
+    this.isWall = isWall ? isWall : false
     this.currentPlayers = currentPlayers ? currentPlayers : new Set()
-
-    if (row === 4 && col == 4)
-      this.isWall = true
-    else
-      this.isWall = false
-
   }
 
   getPlayerCount() {
@@ -22,4 +17,9 @@ export default class Square {
   removePlayer(player) {
     this.currentPlayers.delete(player)
   }
+
+  setAsWall() {
+    this.isWall = true
+  }
+
 }

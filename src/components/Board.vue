@@ -31,7 +31,7 @@ export default {
   },
   data() {
     return {
-      board: BoardHelper.initializeBoard(),
+      board: BoardHelper.initializeBoard(0),
       players: [],
       games: [],
       row: -1,
@@ -92,8 +92,8 @@ export default {
     
     move(direction) {
       if (this.canMove && this.currentGame.gameStarted) {
-        const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
-        if (!newSquare.isWall) {
+        const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col, this.currentGame.mapConfig)
+        if (newSquare !== false) {
 
           let dir = ""
           if (newSquare.col - this.col === 1)
@@ -104,7 +104,7 @@ export default {
             dir = "up"
           else
             dir = "down"
-
+            
           this.row = newSquare.row
           this.col = newSquare.col
           
@@ -120,7 +120,7 @@ export default {
           }
         } 
         else {
-          alert("can't move")
+          alert("You can't move past walls :p")
         }
       }
     },
@@ -131,7 +131,8 @@ export default {
           this.playerID, 
           this.playersInGame, 
           this.row, 
-          this.col)
+          this.col,
+          this.currentGame.mapConfig)
     },
 
     randomMove() {
@@ -141,9 +142,10 @@ export default {
             this.playerID, 
             this.board, 
             this.row, 
-            this.col)
+            this.col,
+            this.currentGame.mapConfig)
         }
-        while (newSquare.isWall)
+        while (newSquare !== false)
 
         this.row = newSquare.row
         this.col = newSquare.col
