@@ -103,11 +103,11 @@ export default {
     },
 
     minPlayersReached() {
-      return this.players.length >= 2 // TODO: change to 4 (minimum)
+      return this.players.length >= 4
     },
 
     lobbyIsFull() {
-      return this.players.length === 10 // TODO: change to 10 (max)
+      return this.players.length === 10
     },
 
     gameStarted() {
