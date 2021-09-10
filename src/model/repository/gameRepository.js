@@ -1,22 +1,11 @@
 import { db } from '@/firebase'
 
-export default class PlayerRepository {
-  static initGame() {
-    db.ref(`game`).on("value", snapshot => {
-      if (!snapshot.exists()) {
-        console.log("creating game")
-        const gameStarted = false
-        db.ref(`game`).set({
-          gameStarted
-        })
-      } else {
-        console.log("game already exists")
-      }
-    })
+export default class GameRepository {
+  static initGame(id) {
+    db.ref(`game/${id}`).set({ gameStarted: false })
   }
 
-  static startGame() {
-    const gameStarted = true
-    db.ref(`game`).set({gameStarted})
+  static startGame(id) {
+    db.ref(`game/${id}`).set({ gameStarted: true })
   }
 }
