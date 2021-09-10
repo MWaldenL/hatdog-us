@@ -10,10 +10,7 @@ export default class BoardHelper {
     }
     for (let i=0; i < 15; i++) {
       for (let j=0; j < 15; j++) {
-        res[i][j] = new Square(i, j)
-        if (this.isSquareWall(mapConfig, i, j)) {
-          res[i][j].setAsWall()
-        }
+        res[i][j] = new Square(i, j, this.isSquareWall(mapConfig, i, j))
       }
     }
 
@@ -21,17 +18,26 @@ export default class BoardHelper {
   }
 
   static isSquareWall(mapConfig, row, col) {
+    let val
+
     switch (mapConfig) {
-      case 1: return config1[row][col]
-      case 2: return config2[row][col]
-      case 3: return config3[row][col]
-      case 4: return config4[row][col]
-      case 5: return config5[row][col]
-      default: return false
+      case 1: val = config1[row][col] 
+      break
+      case 2: val = config2[row][col]
+      break
+      case 3: val = config3[row][col]
+      break
+      case 4: val = config4[row][col]
+      break
+      case 5: val = config5[row][col]
+      break
+      default: val = 0
     }
+
+    return val === 1 ? true : false
   }
 
-  static move(player, direction, board, row, col) {
+  static move(player, direction, board, row, col, mapConfig) {
     const up = ['ArrowUp', 'W', 'w'].includes(direction)
     const down = ['ArrowDown', 'S', 's'].includes(direction)
     const left = ['ArrowLeft', 'A', 'a'].includes(direction)
@@ -40,15 +46,22 @@ export default class BoardHelper {
 
     if (up || down) {
       toMove = up ? Math.max(row-1, 0) : Math.min(row+1, board.length-1)
+      if (this.isSquareWall(mapConfig, toMove, col))
+        return false
+
       if (this._squareHasMaxOnePlayer(board, toMove, col)) {
         res = new Square(toMove, col) // save new square object to be received
       }
     } else if (left || right) {
       toMove = left ? Math.max(col-1, 0) : Math.min(col+1, board.length-1)
+      if (this.isSquareWall(mapConfig, row, toMove))
+        return false
+
       if (this._squareHasMaxOnePlayer(board, row, toMove)) {
         res = new Square(row, toMove)
       }
     } 
+
     return res
   }
 
@@ -64,11 +77,17 @@ export default class BoardHelper {
 
     if (up || down) {
       toMove = up ? Math.max(row-1, 0) : Math.min(row+1, board.length-1)
+      if (this.isSquareWall(mapConfig, toMove, col))
+        return false
+
       if (this._squareHasMaxOnePlayer(board, toMove, col)) {
         res = new Square(toMove, col) // save new square object to be received
       }
     } else if (left || right) {
       toMove = left ? Math.max(col-1, 0) : Math.min(col+1, board.length-1)
+      if (this.isSquareWall(mapConfig, row, toMove))
+        return false
+        
       if (this._squareHasMaxOnePlayer(board, row, toMove)) {
         res = new Square(row, toMove)
       }

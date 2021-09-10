@@ -69,8 +69,8 @@ export default {
     
     move(direction) {
       if (this.canMove && this.currentGame.gameStarted) {
-        const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
-        if (!newSquare.isWall) {
+        const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col, this.currentGame.mapConfig)
+        if (newSquare !== false) {
           this.row = newSquare.row
           this.col = newSquare.col
           PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
@@ -106,9 +106,10 @@ export default {
             this.playerID, 
             this.board, 
             this.row, 
-            this.col)
+            this.col,
+            this.currentGame.mapConfig)
         }
-        while (newSquare.isWall)
+        while (newSquare !== false)
 
         this.row = newSquare.row
         this.col = newSquare.col
