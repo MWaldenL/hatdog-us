@@ -52,7 +52,7 @@ export default {
         this.games.filter(game => game['.key'] === this.roomCode).length > 0
     },
     isGameFull() {
-      return this.playersInRoom.length === 3
+      return this.playersInRoom.length === 10
     },
     isGameStarted() {
       return this.desiredGame ? this.desiredGame.gameStarted : false
