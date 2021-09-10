@@ -15,7 +15,6 @@ export default class GameHelper {
   ]
 
   static getBoardWithPlayers(players, mapConfig) {
-    console.log(mapConfig)
     let newBoard = BoardHelper.initializeBoard(mapConfig)
     if (!players || players.length === 0) { // early abort if players are undefined or empty
       return newBoard
@@ -27,12 +26,14 @@ export default class GameHelper {
     return newBoard
   }
 
-  static getStartingSquare(players, mapConfig) { // no wall checking yet for now
+  static getStartingSquare(players, mapConfig) {
     let row = 0, col = 0, badSquare
-    if (!players || players.length === 0) { // no need to check if first player to enter
-      row = Helper.getRandomInt(0, 15)
-      col = Helper.getRandomInt(0, 15)
-    } else { // check only when there are existing players
+    if (!players || players.length === 0) {
+      do {
+        row = Helper.getRandomInt(0, 15)
+        col = Helper.getRandomInt(0, 15)
+      } while (BoardHelper.isSquareWall(mapConfig, row, col))
+    } else { // check only when there are existing players  
       do {
         row = Helper.getRandomInt(0, 15)
         col = Helper.getRandomInt(0, 15)

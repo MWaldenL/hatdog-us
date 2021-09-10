@@ -27,11 +27,13 @@ export default {
     })
     this.row = this.startRow
     this.col = this.startCol
+  },
+  mounted() {
     playersRef.on('value', () => this.showPlayers())
   },
   data() {
     return {
-      board: BoardHelper.initializeBoard(0),
+      board: BoardHelper.initializeBoard(1),
       players: [],
       games: [],
       row: -1,
@@ -126,7 +128,6 @@ export default {
     },
 
     showPlayers() {
-      console.log(this.currentGame)
       this.board = GameHelper.getBoardWithPlayers(this.playersInGame, this.currentGame.mapConfig)
     },
 

@@ -3,7 +3,7 @@ import GameHelper from './GameHelper'
 import Helper from './helper'
 
 export default class BoardHelper {
-  static initializeBoard(mapConfig) {
+  static initializeBoard(mapConfig) { 
     let res = []
     for (let i=0; i < 15; i++) {
       res.push([])
@@ -19,7 +19,6 @@ export default class BoardHelper {
 
   static isSquareWall(mapConfig, row, col) {
     let val
-
     switch (mapConfig) {
       case 1: val = config1[row][col] 
       break
@@ -33,7 +32,6 @@ export default class BoardHelper {
       break
       default: val = 0
     }
-
     return val === 1 ? true : false
   }
 
