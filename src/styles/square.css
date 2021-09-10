@@ -18,16 +18,8 @@
 }
 
 .player {
-  position: absolute;
-  z-index: 2;
-  border-radius: 50%;
   width: 40px;
   height: 40px;
-  box-sizing: border-box;
-  opacity: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background-repeat: no-repeat;
   background-size: cover;
   background-blend-mode: multiply;
@@ -36,15 +28,26 @@
 .p1-down {
   background-image: url('./assets/blue_down.png');
 }
-
 .p1-left {
   background-image: url('./assets/blue_left.png');
 }
-
 .p1-right {
   background-image: url('./assets/blue_right.png');
 }
-
 .p1-up {
   background-image: url('./assets/blue_up.png');
+}
+
+
+.p2-down {
+  background-image: url('./assets/green_down.png');
+}
+.p2-left {
+  background-image: url('./assets/green_left.png');
+}
+.p2-right {
+  background-image: url('./assets/green_right.png');
+}
+.p2-up {
+  background-image: url('./assets/green_up.png');
 }

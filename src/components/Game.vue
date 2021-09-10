@@ -208,10 +208,10 @@ export default {
     waitTwoSeconds() {
       if (!this.game.gameStarted) { return }
       this.hasMovedAfterContact = true //used in forced move
-      this.timer = 2
+      this.timer = 0 // TODO: revert to 2
       this.canMove = false
       let time = setInterval(() => {
-        this.timer--
+        //this.timer--
         if (this.timer === 0) {
           clearInterval(time)
           this.canMove = true

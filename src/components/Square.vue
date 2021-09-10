@@ -1,6 +1,6 @@
 <template>
 <td class="square" :class="{ light: !isWall, dark: isWall }">
-  <div id="checker-black" :class="playerPiece(dir)" v-show="hasPiece" />
+  <div id="checker-black" :class="playerPiece(dir, num)" v-show="hasPiece" />
 </td>
 </template>
 
@@ -10,11 +10,15 @@ export default {
     hasPiece: Boolean,
     row: Number,
     col: Number,
-    isWall: Boolean
+    isWall: Boolean,
+    dir: String
   },
 
   methods: {
-    playerPiece(dir) {
+    playerPiece(dir, num) {
+
+      console.log(`num: ${num}`)
+
       let up, down, left, right
       up = down = left = right = false
 
