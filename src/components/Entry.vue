@@ -2,11 +2,11 @@
   <div id="entryPage" v-if="currentPage === 'entry'">
     <h1>Welcome to Hatdog Us!</h1> 
     <button @click="showRoomCodeForm">Enter Room</button>
-    <button @click="enterGame">Create Room</button>
+    <button @click="createRoom">Create Room</button>
   </div>
   <div id="roomCodeForm" v-else-if="currentPage === 'roomCodeForm'">
     <h1>Enter room code:</h1> 
-    <input type="text" @keyup.enter="enterGame" v-model="roomCode" />
+    <input type="text" @keyup.enter="enterExistingRoom" v-model="roomCode" />
     <p class="err-message" v-if="!firstTime && !doesGameExist">This game does not exist.</p>
     <p class="err-message" v-if="isGameFull">This game is full.</p>
     <p class="err-message" v-if="isGameStarted">This game has already started.</p>
@@ -14,7 +14,7 @@
     <h1>Enter name:</h1> 
     <input type="text" v-model="name" />
 
-    <button :disabled="!canEnterGame" @click="enterGame">Play</button>
+    <button :disabled="!canEnterGame" @click="enterExistingRoom">Play</button>
     <button @click="back">Back</button>
   </div>
 </template>
@@ -65,24 +65,23 @@ export default {
     showRoomCodeForm() {
       this.currentPage = 'roomCodeForm'
     },
-    enterGame() {
+    enterExistingRoom() {
       this.firstTime = false
       if (!this.doesGameExist) {
         return
       }
-      if (this.roomCode === '') {
-        this.$emit('enterGame', { 
-          roomCode: Helper.getRoomCode(),
-          isNewRoom: true,
-          name: this.name
-        })
-      } else {
-        this.$emit('enterGame', { 
-          roomCode: this.roomCode, 
-          isNewRoom: false,
-          name: this.name
-        })
-      }
+      this.$emit('enterGame', { 
+        roomCode: this.roomCode, 
+        isNewRoom: false,
+        name: this.name
+      })
+    },
+    createRoom() {
+      this.$emit('enterGame', { 
+        roomCode: Helper.getRoomCode(),
+        isNewRoom: true,
+        name: this.name
+      })
     },
     back() {
       this.currentPage = 'entry'
