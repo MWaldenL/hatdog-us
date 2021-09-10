@@ -1,9 +1,9 @@
 export default class Square {
-  constructor(row, col, isWall) {
+  constructor(row, col, isWall, currentPlayers) {
     this.row = row
     this.col = col
     this.isWall = isWall ? isWall : false
-    this.currentPlayers = new Set()
+    this.currentPlayers = currentPlayers ? currentPlayers : new Set()
   }
 
   getPlayerCount() {
