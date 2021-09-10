@@ -3,12 +3,6 @@ export default class Square {
     this.row = row
     this.col = col
     this.currentPlayers = currentPlayers ? currentPlayers : new Set()
-
-    if (row === 4 && col == 4)
-      this.isWall = true
-    else
-      this.isWall = false
-
   }
 
   getPlayerCount() {
@@ -22,4 +16,9 @@ export default class Square {
   removePlayer(playerId) {
     this.currentPlayers.delete(playerId)
   }
+
+  setAsWall() {
+    this.isWall = true
+  }
+
 }

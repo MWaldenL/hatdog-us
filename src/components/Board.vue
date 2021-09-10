@@ -29,7 +29,7 @@ export default {
   },
   data() {
     return {
-      board: BoardHelper.initializeBoard(),
+      board: BoardHelper.initializeBoard(0),
       players: [],
       games: [],
       row: -1,
@@ -84,7 +84,7 @@ export default {
           }
         } 
         else {
-          alert("can't move")
+          alert("You can't move past walls :p")
         }
       }
     },
@@ -95,7 +95,8 @@ export default {
           this.playerID, 
           this.playersInGame, 
           this.row, 
-          this.col)
+          this.col,
+          this.currentGame.mapConfig)
     },
 
     randomMove() {

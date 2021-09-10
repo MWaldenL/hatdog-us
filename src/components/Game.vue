@@ -47,6 +47,7 @@ import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
 import GameRepository from '@/model/repository/gameRepository'
 import GameHelper from '@/helpers/GameHelper'
+import Helper from '@/helpers/helper'
 import Board from './Board'
 import _ from 'underscore'
 import Dialog from './Dialog.vue'
@@ -70,7 +71,8 @@ export default {
       hasMovedAfterContact: false,
       cleanCount: 0,
       infectedCount: 0,
-      connectionListener: null
+      connectionListener: null,
+      mapConfig: 0
     }
   },
   firebase: {
@@ -122,13 +124,21 @@ export default {
   methods: {
     async enterGame(payload) {
       const { roomCode, isNewRoom, name } = payload
+
       this.playerID = Date.now().toString()
       this.gameID = roomCode
-      this.setStartingPos()
+    
+      if (isNewRoom) {
+        this.mapConfig = Helper.getRandomInt(1, 5)
+      } else {
+        this.mapConfig = this.game.mapConfig
+      }
+
+      this.setStartingPos(this.mapConfig)
 
       // If new room, create a new game 
       if (isNewRoom) {
-        await GameRepository.initGame(this.gameID)
+        await GameRepository.initGame(this.gameID, this.mapConfig)
       }
 
       // Add the player to the game object
@@ -195,11 +205,11 @@ export default {
       }
       
       this.canMove = true
-      GameRepository.startGame(this.gameID, this.players.length - sampleSize, sampleSize)
+      GameRepository.startGame(this.gameID, this.players.length - sampleSize, sampleSize, this.mapConfig)
     },
 
-    setStartingPos() {
-      const square = GameHelper.getStartingSquare(this.players)
+    setStartingPos(mapConfig) {
+      const square = GameHelper.getStartingSquare(this.players, mapConfig)
       this.row = square.row
       this.col = square.col
     },
