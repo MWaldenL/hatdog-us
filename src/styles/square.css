@@ -38,7 +38,6 @@
   background-image: url('./assets/blue_up.png');
 }
 
-
 .p2-down {
   background-image: url('./assets/green_down.png');
 }
@@ -50,4 +49,108 @@
 }
 .p2-up {
   background-image: url('./assets/green_up.png');
+}
+
+.p3-down {
+  background-image: url('./assets/gray_down.png');
+}
+.p3-left {
+  background-image: url('./assets/gray_left.png');
+}
+.p3-right {
+  background-image: url('./assets/gray_right.png');
+}
+.p3-up {
+  background-image: url('./assets/gray_up.png');
+}
+
+.p4-down {
+  background-image: url('./assets/light_blue_down.png');
+}
+.p4-left {
+  background-image: url('./assets/light_blue_left.png');
+}
+.p4-right {
+  background-image: url('./assets/light_blue_right.png');
+}
+.p4-up {
+  background-image: url('./assets/light_blue_up.png');
+}
+
+.p5-down {
+  background-image: url('./assets/orange_down.png');
+}
+.p5-left {
+  background-image: url('./assets/orange_left.png');
+}
+.p5-right {
+  background-image: url('./assets/orange_right.png');
+}
+.p5-up {
+  background-image: url('./assets/orange_up.png');
+}
+
+.p6-down {
+  background-image: url('./assets/purple_down.png');
+}
+.p6-left {
+  background-image: url('./assets/purple_left.png');
+}
+.p6-right {
+  background-image: url('./assets/purple_right.png');
+}
+.p6-up {
+  background-image: url('./assets/purple_up.png');
+}
+
+.p7-down {
+  background-image: url('./assets/red_down.png');
+}
+.p7-left {
+  background-image: url('./assets/red_left.png');
+}
+.p7-right {
+  background-image: url('./assets/red_right.png');
+}
+.p7-up {
+  background-image: url('./assets/red_up.png');
+}
+
+.p8-down {
+  background-image: url('./assets/white_down.png');
+}
+.p8-left {
+  background-image: url('./assets/white_left.png');
+}
+.p8-right {
+  background-image: url('./assets/white_right.png');
+}
+.p8-up {
+  background-image: url('./assets/white_up.png');
+}
+
+.p9-down {
+  background-image: url('./assets/yellow_down.png');
+}
+.p9-left {
+  background-image: url('./assets/yellow_left.png');
+}
+.p9-right {
+  background-image: url('./assets/yellow_right.png');
+}
+.p9-up {
+  background-image: url('./assets/yellow_up.png');
+}
+
+.p10-down {
+  background-image: url('./assets/brown_down.png');
+}
+.p10-left {
+  background-image: url('./assets/brown_left.png');
+}
+.p10-right {
+  background-image: url('./assets/brown_right.png');
+}
+.p10-up {
+  background-image: url('./assets/brown_up.png');
 }

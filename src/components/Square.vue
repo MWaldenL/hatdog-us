@@ -11,32 +11,17 @@ export default {
     row: Number,
     col: Number,
     isWall: Boolean,
-    dir: String
+    dir: String,
+    num: Number,
   },
 
   methods: {
     playerPiece(dir, num) {
 
-      console.log(`num: ${num}`)
-
-      let up, down, left, right
-      up = down = left = right = false
-
-      if (dir === 'up')
-        up = true
-      else if (dir === 'down')
-        down = true
-      else if (dir === 'left')
-        left = true
-      else if (dir === 'right')
-        right = true
-
+      let playerClass = `p${num}-${dir}`
       return {
         'player': true,
-        'p1-up': up,
-        'p1-down': down,
-        'p1-left': left,
-        'p1-right': right,
+        [playerClass]: true,
       }
     }
   }

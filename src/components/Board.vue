@@ -81,6 +81,7 @@ export default {
         return ""
       else {
         const [one] = square.currentPlayers
+        console.log("num " + one.playerNum)
         return one.playerNum
       }
     },
