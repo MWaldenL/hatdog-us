@@ -28,7 +28,7 @@ export default {
     return {
       board: BoardHelper.initializeBoard(),
       players: [],
-      game: [],
+      games: [],
       row: -1,
       col: -1
     }
@@ -43,6 +43,9 @@ export default {
   computed: {
     playersInGame() {
       return this.players.filter(player => player.gameID === this.gameID)
+    },
+    currentGame() {
+      return this.games.filter(game => game['.key'] === this.gameID)[0]
     }
   },
   props: {
@@ -62,7 +65,7 @@ export default {
     },
     
     move(direction) {
-      if (this.canMove && this.game.gameStarted) {
+      if (this.canMove && this.currentGame.gameStarted) {
         const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
         if (!newSquare.isWall) {
           this.row = newSquare.row
