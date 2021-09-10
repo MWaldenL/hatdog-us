@@ -1,20 +1,18 @@
 <template>
-  <div id="entryForm" v-if="!entered">
-    <h1>Enter Name:</h1> 
-    <input type="text" @keyup.enter="enterGame" v-model="name" />
-    <button :disabled="lobbyIsFull" @click="enterGame">Play</button>
-  </div>
+  <Entry v-if="!entered" @enterGame="enterGame" />
   <div id="home" v-else>
+    <h1>Game ID: {{ gameID }}</h1><br>
     <div id="playerList">
       <h1>Team Count</h1>
       <p>Clean: {{cleanCount}}</p>
       <p>Infected: {{infectedCount}}</p>
-      <h1>Players ({{players.length}}):</h1> 
-      <ul v-for="p in players" :key="p.id">
-        <li v-if="p.online">{{ p.name }}</li>
+      <h1>Players ({{ players.length }}):</h1> 
+      <ul v-for="player in players" :key="player.id">
+        <li v-if="player.online">{{ player.name }}</li>
       </ul>
     </div>
     <Board 
+      :gameID="gameID"
       :playerID="playerID"
       :startRow="row" 
       :startCol="col"
@@ -24,23 +22,17 @@
     <div id="timer">
       <h1>Move in: {{ timer }}</h1>
     </div>
-    <div v-if="player && game && player.host && !game.gameStarted">
+    <div v-if="playerIsHost">
       <div>You are the host.</div>
       <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
     </div>
     <Dialog :isOpen="dialogOpen" :timer="dialogTimer" :message="dialogMessage" @contact="showDialog"/>
     <!-- TODO: FIX UI -->
-    <div v-if="game && game.gameStarted">
+    <div v-if="this.gameStarted">
       Game has started.
-      <div v-if="player && player.infected">
-        You are infected.
-      </div>
-      <div v-else>
-        You are clean.
-      </div>
-      <div v-if="forceMoveTimer != 0">
-        You will be forcefully moved in {{forceMoveTimer}}
-      </div>
+      <div v-if="player && player.infected">You are infected.</div>
+      <div v-else>You are clean.</div>
+      <div v-if="forceMoveTimer != 0">You will be forcefully moved in {{forceMoveTimer}}</div>
     </div>
 
   </div>
@@ -48,6 +40,7 @@
 
 <script>
 import { db, playersRef, gameRef } from "@/firebase"
+import Entry from './Entry'
 import Player from '@/model/dataobjects/Player'
 import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
@@ -60,11 +53,11 @@ import Dialog from './Dialog.vue'
 export default {
   data() {
     return {
-      name: '',
+      gameID: '',
       playerID: '',
       player: null,
-      players: [],
-      game: null,
+      allPlayers: [],
+      allGames: [],
       row: -1,
       col: -1,
       canMove: true,
@@ -79,16 +72,25 @@ export default {
     }
   },
   firebase: {
-    players: playersRef,
-    game: gameRef
+    allPlayers: playersRef,
+    allGames: gameRef
   },
   components: {
+    Entry,
     Board,
     Dialog
   },
   computed: {
     entered() {
       return this.playerID.length > 0
+    },
+
+    players() {
+      return this.allPlayers.filter(player => player.gameID === this.gameID)
+    },
+
+    game() {
+      return this.allGames.filter(game => game['.key'] === this.gameID)[0]
     },
 
     hostExists() {
@@ -99,30 +101,50 @@ export default {
     },
 
     minPlayersReached() {
-      return this.players.length >= 4 // TODO: change to 4 (minimum)
+      return this.players.length >= 2 // TODO: change to 4 (minimum)
     },
 
     lobbyIsFull() {
-      return this.players.length == 10 // TODO: change to 10 (max)
+      return this.players.length === 10 // TODO: change to 10 (max)
+    },
+
+    gameStarted() {
+      return this.game && this.game.gameStarted
+    },
+
+    playerIsHost() {
+      return this.player && this.game && this.player.host && !this.game.gameStarted
     }
   },
 
   methods: {
-    enterGame() {
+    async enterGame(payload) {
+      const { roomCode, isNewRoom, name } = payload
       this.playerID = Date.now().toString()
+      this.gameID = roomCode
       this.setStartingPos()
 
-      PlayerRepository.addPlayer(new Player({
+      // If new room, create a new game 
+      if (isNewRoom) {
+        await GameRepository.initGame(this.gameID)
+      }
+
+      // Add the player to the game object
+      await PlayerRepository.addPlayer(new Player({
         id: this.playerID,
-        gameID: 'sample123',
-        name: this.name,
+        gameID: this.gameID,
+        name,
         square: new Square(this.row, this.col),
         online: true,
-        host: !this.hostExists
+        host: isNewRoom // player is host if he created a new room
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
-      GameRepository.initGame()
 
+      // Set the current player
+      await this.setCurrentPlayer()
+    },
+
+    setCurrentPlayer() {
       db.ref(`players/${this.playerID}`).on("value", (snapshot) => {
         this.player = snapshot.val()
 
@@ -141,7 +163,7 @@ export default {
     },
 
     startGame() {
-      this.canMove = true
+      console.log(`starting game ${this.gameID}`)
       
       // randomly select players to set as infected
       let sampleSize = 0
@@ -150,9 +172,12 @@ export default {
       else if (this.players.length >= 7 && this.players.length <= 10)
         sampleSize = 3
       let randomPlayers = _.sample(this.players, sampleSize)
-      for (let p of randomPlayers)
+      for (let p of randomPlayers) {
         PlayerRepository.updatePlayer(p.id, "infected", true)
-      GameRepository.startGame(this.players.length - sampleSize, sampleSize)
+      }
+      
+      this.canMove = true
+      GameRepository.startGame(this.gameID, this.players.length - sampleSize, sampleSize)
     },
 
     setStartingPos() {
@@ -162,18 +187,16 @@ export default {
     },
 
     waitTwoSeconds() {
-      if (this.game.gameStarted) {
-        this.hasMovedAfterContact = true //used in forced move
-        this.timer = 2
-        this.canMove = false
-        let time = setInterval(() => {
-          this.timer--
-          if (this.timer === 0) {
-            clearInterval(time)
-            this.canMove = true
-          }
-        }, 1000)
-      }
+      if (!this.game.gameStarted) { return }
+      this.timer = 2
+      this.canMove = false
+      let time = setInterval(() => {
+        this.timer--
+        if (this.timer === 0) {
+          clearInterval(time)
+          this.canMove = true
+        }
+      }, 1000)
     },
 
     showDialog() {
