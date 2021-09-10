@@ -10,12 +10,12 @@ export default class Square {
     return this.currentPlayers.size
   }
 
-  addPlayer(playerId) {
-    this.currentPlayers.add(playerId)
+  addPlayer(player) {
+    this.currentPlayers.add(player)
   }
 
-  removePlayer(playerId) {
-    this.currentPlayers.delete(playerId)
+  removePlayer(player) {
+    this.currentPlayers.delete(player)
   }
 
   setAsWall() {

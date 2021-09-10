@@ -132,7 +132,8 @@ export default class BoardHelper {
 
   static getOtherPlayerInSquare(selfId, board, row, col) {
     let playersSet = board[row][col].currentPlayers
-    let playerArr = [...playersSet].filter(id => id !== selfId)
+    console.log(playersSet)
+    let playerArr = [...playersSet].filter(p => p.id !== selfId)
     return playerArr[0]
   }
 
