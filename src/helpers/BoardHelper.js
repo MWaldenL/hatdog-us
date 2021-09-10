@@ -65,7 +65,7 @@ export default class BoardHelper {
     return res
   }
 
-  static randomMove(player, board, row, col) {
+  static randomMove(player, board, row, col, mapConfig) {
     let randomIndex = Helper.getRandomInt(0, GameHelper.moveKeys.length)
     let direction = GameHelper.moveKeys[randomIndex]
     
@@ -87,7 +87,7 @@ export default class BoardHelper {
       toMove = left ? Math.max(col-1, 0) : Math.min(col+1, board.length-1)
       if (this.isSquareWall(mapConfig, row, toMove))
         return false
-        
+
       if (this._squareHasMaxOnePlayer(board, row, toMove)) {
         res = new Square(row, toMove)
       }
