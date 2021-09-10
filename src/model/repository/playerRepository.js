@@ -2,7 +2,7 @@ import { db } from '@/firebase'
 
 export default class PlayerRepository {
   static addPlayer(p) {
-    const { id, gameID, name, square, online, host, infected } = p
+    const { id, gameID, name, square, online, host, infected, contactInfo } = p
     db.ref(`players/${id}`).set({
       id,
       gameID, 
@@ -10,7 +10,8 @@ export default class PlayerRepository {
       square,
       online,
       host,
-      infected
+      infected,
+      contactInfo
     })
   }
 
@@ -22,6 +23,10 @@ export default class PlayerRepository {
     db.ref(`players/${id}/square`).set({ row, col })
   }
 
+  static updatePlayerContactInfo(id, inContact, withAlly, isReceiver, otherName) {
+    db.ref(`players/${id}/contactInfo`).set({inContact, withAlly, isReceiver, otherName})
+  }
+
   static removePlayer(id) {
     db.ref(`players/${id}`).remove()
   }
@@ -31,11 +36,11 @@ export default class PlayerRepository {
       return 
     }
     const connRef = db.ref('.info/connected')
-    const statusRef = db.ref(`players/${id}/online`)
+    const playerRef = db.ref(`players/${id}`)
+
     connRef.on("value", snap => {
       if (snap.val()) {
-        db.ref(`players/${id}`).onDisconnect().remove()
-        statusRef.set(true)
+        playerRef.onDisconnect().remove()
       }
     })
   }

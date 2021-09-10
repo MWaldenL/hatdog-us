@@ -19,7 +19,10 @@ import { playersRef, gameRef } from '@/firebase'
 
 export default {
   created() {
-    window.addEventListener('keydown', e => this.move(e.key))
+    window.addEventListener('keydown', e => {
+      if (GameHelper.moveKeys.includes(e.key))
+        this.move(e.key)
+    })
     this.row = this.startRow
     this.col = this.startCol
     playersRef.on('value', () => this.showPlayers())
@@ -71,8 +74,16 @@ export default {
           this.row = newSquare.row
           this.col = newSquare.col
           PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
-          this.$emit('playerMoved')
-        } else {
+
+          if (BoardHelper.getPlayerCountInSquare(this.board, this.row, this.col) === 2) {
+            let otherPlayerID = BoardHelper.getOtherPlayerInSquare(this.playerID, this.board, this.row, this.col)
+            GameHelper.simulateContactInteraction(this.playerID, otherPlayerID)
+          }
+          else {
+            this.$emit('playerMoved')
+          }
+        } 
+        else {
           alert("can't move")
         }
       }
@@ -85,7 +96,33 @@ export default {
           this.playersInGame, 
           this.row, 
           this.col)
+    },
+
+    randomMove() {
+        let newSquare
+        do {
+          newSquare = BoardHelper.randomMove(
+            this.playerID, 
+            this.board, 
+            this.row, 
+            this.col)
+        }
+        while (newSquare.isWall)
+
+        this.row = newSquare.row
+        this.col = newSquare.col
+        PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
+        
+        if (BoardHelper.getPlayerCountInSquare(this.board, this.row, this.col) === 2) {
+          let otherPlayerID = BoardHelper.getOtherPlayerInSquare(this.playerID, this.board, this.row, this.col)
+          GameHelper.simulateContactInteraction(this.playerID, otherPlayerID)
+        }
+        else {
+          this.$emit('playerMoved')
+        }
     }
+
   }
 }
+
 </script>

@@ -1,4 +1,6 @@
 export default class Helper {
+
+  // returns integer in the range min to (max-1) inclusive
   static getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);

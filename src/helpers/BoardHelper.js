@@ -1,4 +1,6 @@
 import Square from '@/model/dataobjects/Square'
+import GameHelper from './GameHelper'
+import Helper from './helper'
 
 export default class BoardHelper {
   static initializeBoard() {
@@ -15,6 +17,30 @@ export default class BoardHelper {
   }
 
   static move(player, direction, board, row, col) {
+    const up = ['ArrowUp', 'W', 'w'].includes(direction)
+    const down = ['ArrowDown', 'S', 's'].includes(direction)
+    const left = ['ArrowLeft', 'A', 'a'].includes(direction)
+    const right = ['ArrowRight', 'D', 'd'].includes(direction)
+    let res = new Square(row, col), toMove
+
+    if (up || down) {
+      toMove = up ? Math.max(row-1, 0) : Math.min(row+1, board.length-1)
+      if (this._squareHasMaxOnePlayer(board, toMove, col)) {
+        res = new Square(toMove, col) // save new square object to be received
+      }
+    } else if (left || right) {
+      toMove = left ? Math.max(col-1, 0) : Math.min(col+1, board.length-1)
+      if (this._squareHasMaxOnePlayer(board, row, toMove)) {
+        res = new Square(row, toMove)
+      }
+    } 
+    return res
+  }
+
+  static randomMove(player, board, row, col) {
+    let randomIndex = Helper.getRandomInt(0, GameHelper.moveKeys.length)
+    let direction = GameHelper.moveKeys[randomIndex]
+    
     const up = ['ArrowUp', 'W', 'w'].includes(direction)
     const down = ['ArrowDown', 'S', 's'].includes(direction)
     const left = ['ArrowLeft', 'A', 'a'].includes(direction)
@@ -68,6 +94,16 @@ export default class BoardHelper {
         return false
     }
     return true 
+  }
+
+  static getOtherPlayerInSquare(selfId, board, row, col) {
+    let playersSet = board[row][col].currentPlayers
+    let playerArr = [...playersSet].filter(id => id !== selfId)
+    return playerArr[0]
+  }
+
+  static getPlayerCountInSquare(board, row, col) {
+    return board[row][col].getPlayerCount()
   }
   
   static _squareHasMaxOnePlayer(board, row, col) {
