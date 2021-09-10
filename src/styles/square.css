@@ -1,32 +1,50 @@
 .square {
-  height: 50px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
   margin: 0;
   padding: 0;
 }
 
 .light {
-  background-color: #ebecd0;
+  background-image: url('./assets/floor.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .dark {
-  background-color: #000000;
+  background-image: url('./assets/wall.png'), url('./assets/floor.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.chip {
+.player {
   position: absolute;
   z-index: 2;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   box-sizing: border-box;
   opacity: 100;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: multiply;
 }
 
-.black-chip {
-  background: radial-gradient(50% 50% at 50% 50%, rgba(48, 48, 48, 0.74) 0%, #424242 100%);
-  border: 10px solid #3A3A3A;
+.p1-down {
+  background-image: url('./assets/blue_down.png');
+}
+
+.p1-left {
+  background-image: url('./assets/blue_left.png');
+}
+
+.p1-right {
+  background-image: url('./assets/blue_right.png');
+}
+
+.p1-up {
+  background-image: url('./assets/blue_up.png');
 }

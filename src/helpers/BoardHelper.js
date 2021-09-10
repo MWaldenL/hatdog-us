@@ -34,6 +34,7 @@ export default class BoardHelper {
         res = new Square(row, toMove)
       }
     } 
+
     return res
   }
 

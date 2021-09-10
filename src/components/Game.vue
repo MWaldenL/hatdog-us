@@ -103,7 +103,7 @@ export default {
     },
 
     minPlayersReached() {
-      return this.players.length >= 4
+      return this.players.length >= 1
     },
 
     lobbyIsFull() {
@@ -138,7 +138,8 @@ export default {
         name,
         square: new Square(this.row, this.col),
         online: true,
-        host: isNewRoom // player is host if he created a new room
+        host: isNewRoom, // player is host if he created a new room
+        playerNum: this.players.length + 1
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
 

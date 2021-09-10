@@ -1,10 +1,11 @@
 <template>
 <div id="table">  
-  <table>
+  <table cellspacing="0" cellpadding="0">
     <tr v-for="(row, rowInd) in board" :key="rowInd">
       <Square v-for="(col, colInd) in row" :key="colInd" 
         :hasPiece="hasPiece(col)"
-        :isWall="isWall(col)" />
+        :isWall="isWall(col)"
+        :dir="getDir(col)" />
     </tr>
   </table>
 </div>
@@ -63,6 +64,17 @@ export default {
       return square.getPlayerCount() > 0
     },
 
+    getDir(square) {
+      if (square.currentPlayers.size === 0)
+        return ""
+      else {
+        const [one] = square.currentPlayers
+        console.log(`dir of one: ${one.dir}`)
+        console.log(square.currentPlayers)
+        return one.dir
+      }
+    },
+
     isWall(square) {
       return square.isWall
     },
@@ -71,9 +83,22 @@ export default {
       if (this.canMove && this.currentGame.gameStarted) {
         const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
         if (!newSquare.isWall) {
+
+          let dir = ""
+          if (newSquare.col - this.col === 1)
+            dir = "right"
+          else if (this.col - newSquare.col === 1)
+            dir = "left"
+          else if (this.row - newSquare.row === 1)
+            dir = "up"
+          else
+            dir = "down"
+
           this.row = newSquare.row
           this.col = newSquare.col
+          
           PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
+          PlayerRepository.updatePlayer(this.playerID, "dir", dir)
 
           if (BoardHelper.getPlayerCountInSquare(this.board, this.row, this.col) === 2) {
             let otherPlayerID = BoardHelper.getOtherPlayerInSquare(this.playerID, this.board, this.row, this.col)
