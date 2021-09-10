@@ -68,7 +68,8 @@ export default {
       forceMoveTimer: 0,
       hasMovedAfterContact: false,
       cleanCount: 0,
-      infectedCount: 0
+      infectedCount: 0,
+      connectionListener: null
     }
   },
   firebase: {
@@ -142,6 +143,9 @@ export default {
 
       // Set the current player
       await this.setCurrentPlayer()
+
+      // Set the initial team count
+      await this.setTeamCounter()
     },
 
     setCurrentPlayer() {
@@ -154,9 +158,22 @@ export default {
           PlayerRepository.updatePlayerContactInfo(this.playerID, false, false, false, '')
         }
 
+        this.setConnectionListener()
       })
+    },
 
-      gameRef.on("value", (snapshot) => {
+    setConnectionListener() {
+      if (this.connectionListener != null) 
+        db.ref('.info/connected').off("value", this.connectionListener)
+          
+      this.connectionListener = db.ref('.info/connected').on("value", snap => {
+        if (snap.val()) 
+          GameRepository.updateTeamCountOnDisconnect(this.gameID, this.player.infected)
+      })
+    },
+
+    setTeamCounter() {
+      db.ref(`game/${this.gameID}`).on("value", (snapshot) => {
         this.cleanCount = snapshot.val().cleanCount
         this.infectedCount = snapshot.val().infectedCount
       })
@@ -200,46 +217,43 @@ export default {
     },
 
     showDialog() {
-      if (this.game.gameStarted) {
-        this.dialogMessage = GameHelper.generateDialogMessage(this.player)
-        this.dialogOpen = true
-        this.canMove = false
-        this.dialogTimer = 5
-        this.timer = 5
-        let time = setInterval(() => {
-          this.dialogTimer--
-          this.timer--
-          if (this.dialogTimer === 0) {
-            clearInterval(time)
-            this.dialogOpen = false
-            this.waitForcedMove()
-          }
-        }, 1000)
-      }
+      if (!this.game.gameStarted) { return }
+      this.dialogMessage = GameHelper.generateDialogMessage(this.player)
+      this.dialogOpen = true
+      this.canMove = false
+      this.dialogTimer = 5
+      this.timer = 5
+      let time = setInterval(() => {
+        this.dialogTimer--
+        this.timer--
+        if (this.dialogTimer === 0) {
+          clearInterval(time)
+          this.dialogOpen = false
+          this.waitForcedMove()
+        }
+      }, 1000)
     },
 
     waitForcedMove() {
       this.hasMovedAfterContact = false
       this.canMove = true
-
-      if (this.game.gameStarted) {
-        this.forceMoveTimer = this.player.contactInfo.withAlly ? 2 : 3
-        
-        let time = setInterval(() => {
-          this.forceMoveTimer--
-          if (this.forceMoveTimer === 0) {
-            if (!this.hasMovedAfterContact) {
-              this.$refs.boardRef.randomMove();
-            }
-            clearInterval(time)
+      this.forceMoveTimer = this.player.contactInfo.withAlly ? 2 : 3
+      
+      let time = setInterval(() => {
+        this.forceMoveTimer--
+        if (this.forceMoveTimer === 0) {
+          if (!this.hasMovedAfterContact) {
+            this.$refs.boardRef.randomMove();
           }
-          if (this.hasMovedAfterContact) {
-            this.forceMoveTimer = 0
-            clearInterval(time)
-          }
-        }, 1000)
-      }
+          clearInterval(time)
+        }
+        if (this.hasMovedAfterContact) {
+          this.forceMoveTimer = 0
+          clearInterval(time)
+        }
+      }, 1000)
     }
+
   }
 }
 </script>

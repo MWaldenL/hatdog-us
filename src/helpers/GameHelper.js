@@ -7,7 +7,7 @@ import GameRepository from "../model/repository/gameRepository"
 
 export default class GameHelper {
 
-  static keys = [
+  static moveKeys = [
     'ArrowUp', 'W', 'w',
     'ArrowDown', 'S', 's',
     'ArrowLeft', 'A', 'a', 
@@ -49,12 +49,15 @@ export default class GameHelper {
     playersRef.once("value").then((snapshot) => {            
       let self = snapshot.val()[selfId]
       let other = snapshot.val()[otherPlayerId]
+      let gameId = self.gameID
+
       if (self.infected === other.infected) {        
         PlayerRepository.updatePlayerContactInfo(selfId, true, true, false, other.name)
         PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, true, false, self.name)
       }
       else {
-        let tossCoin = Math.floor(Math.random() * 2)
+        let tossCoin = Helper.getRandomInt(0, 2)
+
         if (tossCoin === 0) {
           let isInfected = !self.infected
           PlayerRepository.updatePlayer(selfId, "infected", isInfected) 
@@ -62,9 +65,9 @@ export default class GameHelper {
           PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, false, false, self.name)
 
           if (isInfected)
-            GameRepository.incrementInfected()
+            GameRepository.incrementInfected(gameId)
           else
-            GameRepository.incrementClean()
+            GameRepository.incrementClean(gameId)
         } 
         else {
           let isInfected = !other.infected
@@ -72,9 +75,9 @@ export default class GameHelper {
           PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, false, true, self.name)
           PlayerRepository.updatePlayerContactInfo(selfId, true, false, false, other.name)
           if (isInfected)
-            GameRepository.incrementInfected()
+            GameRepository.incrementInfected(gameId)
           else
-            GameRepository.incrementClean()
+            GameRepository.incrementClean(gameId)
         }
       }
     })

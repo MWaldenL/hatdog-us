@@ -20,7 +20,7 @@ import { playersRef, gameRef } from '@/firebase'
 export default {
   created() {
     window.addEventListener('keydown', e => {
-      if (GameHelper.keys.includes(e.key))
+      if (GameHelper.moveKeys.includes(e.key))
         this.move(e.key)
     })
     this.row = this.startRow
@@ -99,24 +99,27 @@ export default {
     },
 
     randomMove() {
-        let direction = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
-        let randInd, newSquare
+        let newSquare
         do {
-          randInd = Math.floor(Math.random() * direction.length)
-          newSquare = BoardHelper.move(this.playerID, direction[randInd], this.board, this.row, this.col)
+          newSquare = BoardHelper.randomMove(
+            this.playerID, 
+            this.board, 
+            this.row, 
+            this.col)
         }
         while (newSquare.isWall)
 
         this.row = newSquare.row
         this.col = newSquare.col
         PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)
+        
         if (BoardHelper.getPlayerCountInSquare(this.board, this.row, this.col) === 2) {
-            let otherPlayerID = BoardHelper.getOtherPlayerInSquare(this.playerID, this.board, this.row, this.col)
-            GameHelper.simulateContactInteraction(this.playerID, otherPlayerID)
-          }
-          else {
-            this.$emit('playerMoved')
-          }
+          let otherPlayerID = BoardHelper.getOtherPlayerInSquare(this.playerID, this.board, this.row, this.col)
+          GameHelper.simulateContactInteraction(this.playerID, otherPlayerID)
+        }
+        else {
+          this.$emit('playerMoved')
+        }
     }
 
   }

@@ -30,4 +30,20 @@ export default class GameRepository {
     db.ref(`game/${id}`).child('infectedCount').set(firebase.database.ServerValue.increment(1))
     db.ref(`game/${id}`).child('cleanCount').set(firebase.database.ServerValue.increment(-1))
   }
+
+  static updateTeamCountOnDisconnect(id, isInfected) {
+    db.ref(`game/${id}`).onDisconnect().cancel()
+
+    if (isInfected) {
+      db.ref(`game/${id}`)
+          .onDisconnect()
+          .update({infectedCount: firebase.database.ServerValue.increment(-1)})
+    }
+    else {
+      db.ref(`game/${id}`)
+          .onDisconnect()
+          .update({cleanCount: firebase.database.ServerValue.increment(-1)})
+    }
+  }
+  
 }

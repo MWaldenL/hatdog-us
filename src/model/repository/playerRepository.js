@@ -36,11 +36,11 @@ export default class PlayerRepository {
       return 
     }
     const connRef = db.ref('.info/connected')
-    const statusRef = db.ref(`players/${id}/online`)
+    const playerRef = db.ref(`players/${id}`)
+
     connRef.on("value", snap => {
       if (snap.val()) {
-        db.ref(`players/${id}`).onDisconnect().remove()
-        statusRef.set(true)
+        playerRef.onDisconnect().remove()
       }
     })
   }
