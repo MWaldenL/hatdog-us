@@ -21,14 +21,14 @@ export default class GameRepository {
 
   // implicitly decrements infected count
   static incrementCleanInGame(id) {
-    db.ref(`game/${id}`).child('cleanCount').set(firebase.database.ServerValue.increment(1))
-    db.ref(`game/${id}`).child('infectedCount').set(firebase.database.ServerValue.increment(-1))
+    db.ref(`game/${id}/cleanCount`).set(firebase.database.ServerValue.increment(1))
+    db.ref(`game/${id}/infectedCount`).set(firebase.database.ServerValue.increment(-1))
   }
 
   // implicitly decrements clean count
   static incrementInfectedInGame(id) {
-    db.ref(`game/${id}`).child('infectedCount').set(firebase.database.ServerValue.increment(1))
-    db.ref(`game/${id}`).child('cleanCount').set(firebase.database.ServerValue.increment(-1))
+    db.ref(`game/${id}/infectedCount`).set(firebase.database.ServerValue.increment(1))
+    db.ref(`game/${id}/cleanCount`).set(firebase.database.ServerValue.increment(-1))
   }
 
   static updateTeamCountOnDisconnect(id, isInfected) {

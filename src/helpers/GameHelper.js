@@ -65,9 +65,9 @@ export default class GameHelper {
           PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, false, false, self.name)
 
           if (isInfected)
-            GameRepository.incrementInfected(gameId)
+            GameRepository.incrementInfectedInGame(gameId)
           else
-            GameRepository.incrementClean(gameId)
+            GameRepository.incrementCleanInGame(gameId)
         } 
         else {
           let isInfected = !other.infected
@@ -75,9 +75,9 @@ export default class GameHelper {
           PlayerRepository.updatePlayerContactInfo(otherPlayerId, true, false, true, self.name)
           PlayerRepository.updatePlayerContactInfo(selfId, true, false, false, other.name)
           if (isInfected)
-            GameRepository.incrementInfected(gameId)
+            GameRepository.incrementInfectedInGame(gameId)
           else
-            GameRepository.incrementClean(gameId)
+            GameRepository.incrementCleanInGame(gameId)
         }
       }
     })

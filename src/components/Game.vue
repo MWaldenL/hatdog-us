@@ -20,7 +20,8 @@
       @playerMoved="waitTwoSeconds"
       ref="boardRef"/>
     <div id="timer">
-      <h1>Move in: {{ timer }}</h1>
+      <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
+      <h1 v-else>Move in: {{ dialogTimer }}</h1>
     </div>
     <div v-if="playerIsHost">
       <div>You are the host.</div>
@@ -205,6 +206,7 @@ export default {
 
     waitTwoSeconds() {
       if (!this.game.gameStarted) { return }
+      this.hasMovedAfterContact = true //used in forced move
       this.timer = 2
       this.canMove = false
       let time = setInterval(() => {
@@ -222,22 +224,21 @@ export default {
       this.dialogOpen = true
       this.canMove = false
       this.dialogTimer = 5
-      this.timer = 5
+      let forceTime = this.player.contactInfo.withAlly ? 2 : 3
       let time = setInterval(() => {
         this.dialogTimer--
-        this.timer--
         if (this.dialogTimer === 0) {
           clearInterval(time)
           this.dialogOpen = false
-          this.waitForcedMove()
+          this.waitForcedMove(forceTime)
         }
       }, 1000)
     },
 
-    waitForcedMove() {
+    waitForcedMove(n) {
       this.hasMovedAfterContact = false
       this.canMove = true
-      this.forceMoveTimer = this.player.contactInfo.withAlly ? 2 : 3
+      this.forceMoveTimer = n
       
       let time = setInterval(() => {
         this.forceMoveTimer--
