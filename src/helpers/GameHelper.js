@@ -14,12 +14,12 @@ export default class GameHelper {
     'ArrowRight', 'D', 'd'
   ]
 
-  static getBoardWithPlayers(selfId, players) {
+  static getBoardWithPlayers(players, mapConfig) {
+    console.log(mapConfig)
     let newBoard = BoardHelper.initializeBoard(mapConfig)
     if (!players || players.length === 0) { // early abort if players are undefined or empty
       return newBoard
     }
-    // newBoard[selfRow][selfCol].addPlayer(selfId) // set self first
     for (let player of players) { // set other players
       let {row, col} = player.square
       newBoard[row][col].addPlayer(player)

@@ -78,7 +78,7 @@ export default {
 
     getNum(square) {
       if (square.currentPlayers.size === 0)
-        return ""
+        return -1
       else {
         const [one] = square.currentPlayers
         console.log("num " + one.playerNum)
@@ -126,13 +126,8 @@ export default {
     },
 
     showPlayers() {
-      this.board = GameHelper
-        .getBoardWithPlayers(
-          this.playerID, 
-          this.playersInGame, 
-          this.row, 
-          this.col,
-          this.currentGame.mapConfig)
+      console.log(this.currentGame)
+      this.board = GameHelper.getBoardWithPlayers(this.playersInGame, this.currentGame.mapConfig)
     },
 
     randomMove() {

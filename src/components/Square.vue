@@ -8,8 +8,6 @@
 export default {
   props: {
     hasPiece: Boolean,
-    row: Number,
-    col: Number,
     isWall: Boolean,
     dir: String,
     num: Number,
@@ -17,7 +15,6 @@ export default {
 
   methods: {
     playerPiece(dir, num) {
-
       let playerClass = `p${num}-${dir}`
       return {
         'player': true,
