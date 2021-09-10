@@ -70,7 +70,8 @@ export default {
     move(direction) {
       if (this.canMove && this.currentGame.gameStarted) {
         const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col)
-        if (!newSquare.isWall) {
+        const { row, col } = newSquare
+        if (!this.board[row][col].isWall) {
           this.row = newSquare.row
           this.col = newSquare.col
           PlayerRepository.updatePlayerSquare(this.playerID, this.row, this.col)

@@ -1,7 +1,8 @@
 export default class Square {
-  constructor(row, col, currentPlayers) {
+  constructor(row, col, isWall, currentPlayers) {
     this.row = row
     this.col = col
+    this.isWall = isWall
     this.currentPlayers = currentPlayers ? currentPlayers : new Set()
   }
 
@@ -20,5 +21,4 @@ export default class Square {
   setAsWall() {
     this.isWall = true
   }
-
 }

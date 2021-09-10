@@ -146,7 +146,7 @@ export default {
         id: this.playerID,
         gameID: this.gameID,
         name,
-        square: new Square(this.row, this.col),
+        square: new Square(this.row, this.col, false),
         online: true,
         host: isNewRoom // player is host if he created a new room
       }))
