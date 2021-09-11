@@ -1,18 +1,21 @@
 <template>
   <Entry v-if="!entered" @enterGame="enterGame" />
   <div v-else>
-    <div style="d-flex">
+    <div>
       <h1>Game ID: {{ gameID }}</h1>
     </div>
     <div id="home">
-
+      <!-- Player list -->
       <div id="playerList" style="margin-end: 16px">
         <h1>Team Count</h1>
         <p>Clean: {{cleanCount}}</p>
         <p>Infected: {{infectedCount}}</p>
         <h1>Players ({{ players.length }}):</h1> 
         <ul v-for="player in players" :key="player.id">
-          <li v-if="player.online">{{ player.name }}</li>
+          <PlayerItem v-if="player.online" 
+            :name="player.name"
+            :num="player.playerNum" />
+          <!-- <li v-if="player.online">{{ player.name }}</li> -->
         </ul>
       </div>
       <Board 
@@ -23,6 +26,7 @@
         :canMove="canMove"
         @playerMoved="waitTwoSeconds"
         ref="boardRef"/>
+      <!-- Timer -->
       <div style="margin-start: 16px">
         <div id="timer">
           <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
@@ -48,6 +52,7 @@
 <script>
 import { db, playersRef, gameRef } from "@/firebase"
 import Entry from './Entry'
+import PlayerItem from './PlayerItem' 
 import Player from '@/model/dataobjects/Player'
 import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
@@ -93,7 +98,8 @@ export default {
     Entry,
     Board,
     Dialog, 
-    Modal
+    Modal,
+    PlayerItem
   },
   computed: {
     entered() {
