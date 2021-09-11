@@ -6,7 +6,7 @@
     </div>
     <div id="home">
 
-      <div id="playerList">
+      <div id="playerList" style="margin-end: 16px">
         <h1>Team Count</h1>
         <p>Clean: {{cleanCount}}</p>
         <p>Infected: {{infectedCount}}</p>
@@ -23,7 +23,7 @@
         :canMove="canMove"
         @playerMoved="waitTwoSeconds"
         ref="boardRef"/>
-      <div>
+      <div style="margin-start: 16px">
         <div id="timer">
           <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
           <h1 v-else>Move in: {{ dialogTimer }}</h1>
