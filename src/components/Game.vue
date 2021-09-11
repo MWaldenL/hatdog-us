@@ -123,6 +123,10 @@ export default {
       return this.players.length === 10
     },
 
+    onePlayerLeft() {
+      return this.players.length === 1
+    },
+
     gameStarted() {
       return this.game && this.game.gameStarted
     },
@@ -131,7 +135,14 @@ export default {
       return this.player && this.game && this.player.host && !this.game.gameStarted
     }
   },
-
+  watch: {
+    onePlayerLeft(newValue) {
+      if (newValue === true)
+        db.ref(`game/${this.gameID}`).onDisconnect().remove()
+      else
+        db.ref(`game/${this.gameID}`).onDisconnect().cancel()
+    }
+  },
   methods: {
     async enterGame(payload) {
       const { roomCode, isNewRoom, name } = payload
@@ -185,6 +196,7 @@ export default {
     },
 
     setConnectionListener() {
+      if (!this.game.gameStarted) { return }
       if (this.connectionListener != null) 
         db.ref('.info/connected').off("value", this.connectionListener)
           
@@ -198,10 +210,11 @@ export default {
       db.ref(`game/${this.gameID}`).on("value", (snapshot) => {
         this.cleanCount = snapshot.val().cleanCount
         this.infectedCount = snapshot.val().infectedCount
+        let gameInProgress = snapshot.val().gameStarted
+        let aTeamHasWon = (this.cleanCount === 0 || this.infectedCount === 0)
 
-        if (snapshot.val().gameStarted && (this.cleanCount === 0 || this.infectedCount === 0)) 
+        if (gameInProgress && aTeamHasWon) 
           this.endGame()
-        
       })
     },
 
