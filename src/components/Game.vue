@@ -133,6 +133,10 @@ export default {
 
     playerIsHost() {
       return this.player && this.game && this.player.host && !this.game.gameStarted
+    },
+
+    playerIsHostThroughOut() {
+      return this.player && this.player.host
     }
   },
   watch: {
@@ -141,6 +145,27 @@ export default {
         db.ref(`game/${this.gameID}`).onDisconnect().remove()
       else
         db.ref(`game/${this.gameID}`).onDisconnect().cancel()
+    },
+
+    players(newValue, oldValue) {
+      if (!this.playerIsHostThroughOut) { return }
+      let newOtherPlayers = [...newValue].filter(p => p.id !== this.playerID)
+      let oldOtherPlayers = [...oldValue].filter(p => p.id !== this.playerID)
+
+      if (newOtherPlayers.length !== 0) {
+        if (oldOtherPlayers.length !== 0) {
+          db.ref(`players/${oldOtherPlayers[0].id}`).onDisconnect().cancel()
+        }
+        db.ref(`players/${newOtherPlayers[0].id}`).onDisconnect().update({host: true})
+      }
+      else {
+        db.ref(`players/${oldOtherPlayers[0].id}`).onDisconnect().cancel()
+      }
+    },
+
+    gameStarted(newValue) {
+      if (newValue === true)
+        this.setConnectionListener()
     }
   },
   methods: {
@@ -191,12 +216,12 @@ export default {
           PlayerRepository.updatePlayerContactInfo(this.playerID, false, false, false, '')
         }
 
-        this.setConnectionListener()
+        if (this.gameStarted)
+          this.setConnectionListener()
       })
     },
 
     setConnectionListener() {
-      if (!this.game.gameStarted) { return }
       if (this.connectionListener != null) 
         db.ref('.info/connected').off("value", this.connectionListener)
           
