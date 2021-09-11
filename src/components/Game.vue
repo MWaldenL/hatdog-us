@@ -39,7 +39,8 @@
           <div v-if="forceMoveTimer != 0">You will be forcefully moved in {{forceMoveTimer}}</div>
         </div>
       </div>
-      <Dialog :isOpen="dialogOpen" :timer="dialogTimer" :message="dialogMessage" @contact="showDialog"/>
+      <Dialog :isOpen="dialogOpen" :timer="dialogTimer" :message="dialogMessage"/>
+      <Modal :isOpen="modalOpen" :header="modalHeader" :body="modalBody"/>
     </div>
   </div>
 </template>
@@ -55,7 +56,8 @@ import GameHelper from '@/helpers/GameHelper'
 import Helper from '@/helpers/helper'
 import Board from './Board'
 import _ from 'underscore'
-import Dialog from './Dialog.vue'
+import Dialog from './Dialog'
+import Modal from './Modal'
 
 export default {
   data() {
@@ -77,7 +79,10 @@ export default {
       cleanCount: 0,
       infectedCount: 0,
       connectionListener: null,
-      mapConfig: 0
+      mapConfig: 0,
+      modalHeader: '',
+      modalBody: '',
+      modalOpen: false
     }
   },
   firebase: {
@@ -87,7 +92,8 @@ export default {
   components: {
     Entry,
     Board,
-    Dialog
+    Dialog, 
+    Modal
   },
   computed: {
     entered() {
@@ -161,8 +167,7 @@ export default {
       // Set the current player
       await this.setCurrentPlayer()
 
-      // Set the initial team count
-      await this.setTeamCounter()
+      await this.setTeamCountListener()
     },
 
     setCurrentPlayer() {
@@ -189,10 +194,14 @@ export default {
       })
     },
 
-    setTeamCounter() {
+    setTeamCountListener() {
       db.ref(`game/${this.gameID}`).on("value", (snapshot) => {
         this.cleanCount = snapshot.val().cleanCount
         this.infectedCount = snapshot.val().infectedCount
+
+        if (snapshot.val().gameStarted && (this.cleanCount === 0 || this.infectedCount === 0)) 
+          this.endGame()
+        
       })
     },
 
@@ -208,8 +217,9 @@ export default {
       let randomPlayers = _.sample(this.players, sampleSize)
       for (let p of randomPlayers) {
         PlayerRepository.updatePlayer(p.id, "infected", true)
+        PlayerRepository.updatePlayer(p.id, "initiallyInfected", true)
       }
-      
+
       this.canMove = true
       GameRepository.startGame(this.gameID, this.players.length - sampleSize, sampleSize, this.mapConfig)
     },
@@ -247,6 +257,27 @@ export default {
           clearInterval(time)
           this.dialogOpen = false
           this.waitForcedMove(forceTime)
+        }
+        if (this.modalOpen) {
+          clearInterval(time)
+          this.dialogOpen
+        }
+      }, 1000)
+    },
+
+    endGame() {
+      this.canMove = false
+      let teamInfectedWon = (this.infectedCount != 0)
+      let message = GameHelper.generateEndGameMessage(teamInfectedWon, this.player)
+      this.modalHeader = message.header
+      this.modalBody = message.body
+      let timer = 2
+      let time = setInterval(() => {
+        timer--
+        if (timer === 0) {
+          clearInterval(time)
+          this.dialogOpen = false
+          this.modalOpen = true
         }
       }, 1000)
     },

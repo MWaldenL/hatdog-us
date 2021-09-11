@@ -15,6 +15,6 @@ export default class Player {
     }
     this.playerNum = playerNum
     this.dir = 'down'
-    // TODO: save initial infected state
+    this.initiallyInfected = false
   }
 }
