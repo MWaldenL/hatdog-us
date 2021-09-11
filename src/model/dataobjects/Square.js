@@ -1,25 +1,25 @@
 export default class Square {
-  constructor(row, col, currentPlayers) {
+  constructor(row, col, isWall) {
     this.row = row
     this.col = col
-    this.currentPlayers = currentPlayers ? currentPlayers : new Set()
-
-    if (row === 4 && col == 4)
-      this.isWall = true
-    else
-      this.isWall = false
-
+    this.isWall = isWall ? isWall : false
+    this.currentPlayers = new Set()
   }
 
   getPlayerCount() {
     return this.currentPlayers.size
   }
 
-  addPlayer(playerId) {
-    this.currentPlayers.add(playerId)
+  addPlayer(player) {
+    this.currentPlayers.add(player)
   }
 
-  removePlayer(playerId) {
-    this.currentPlayers.delete(playerId)
+  removePlayer(player) {
+    this.currentPlayers.delete(player)
   }
+
+  setAsWall() {
+    this.isWall = true
+  }
+
 }

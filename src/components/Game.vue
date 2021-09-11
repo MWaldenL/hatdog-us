@@ -1,41 +1,46 @@
 <template>
   <Entry v-if="!entered" @enterGame="enterGame" />
-  <div id="home" v-else>
-    <h1>Game ID: {{ gameID }}</h1><br>
-    <div id="playerList">
-      <h1>Team Count</h1>
-      <p>Clean: {{cleanCount}}</p>
-      <p>Infected: {{infectedCount}}</p>
-      <h1>Players ({{ players.length }}):</h1> 
-      <ul v-for="player in players" :key="player.id">
-        <li v-if="player.online">{{ player.name }}</li>
-      </ul>
+  <div v-else>
+    <div style="d-flex">
+      <h1>Game ID: {{ gameID }}</h1>
     </div>
-    <Board 
-      :gameID="gameID"
-      :playerID="playerID"
-      :startRow="row" 
-      :startCol="col"
-      :canMove="canMove"
-      @playerMoved="waitTwoSeconds"
-      ref="boardRef"/>
-    <div id="timer">
-      <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
-      <h1 v-else>Move in: {{ dialogTimer }}</h1>
-    </div>
-    <div v-if="playerIsHost">
-      <div>You are the host.</div>
-      <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
-    </div>
-    <Dialog :isOpen="dialogOpen" :timer="dialogTimer" :message="dialogMessage" @contact="showDialog"/>
-    <!-- TODO: FIX UI -->
-    <div v-if="this.gameStarted">
-      Game has started.
-      <div v-if="player && player.infected">You are infected.</div>
-      <div v-else>You are clean.</div>
-      <div v-if="forceMoveTimer != 0">You will be forcefully moved in {{forceMoveTimer}}</div>
-    </div>
+    <div id="home">
 
+      <div id="playerList" style="margin-end: 16px">
+        <h1>Team Count</h1>
+        <p>Clean: {{cleanCount}}</p>
+        <p>Infected: {{infectedCount}}</p>
+        <h1>Players ({{ players.length }}):</h1> 
+        <ul v-for="player in players" :key="player.id">
+          <li v-if="player.online">{{ player.name }}</li>
+        </ul>
+      </div>
+      <Board 
+        :gameID="gameID"
+        :playerID="playerID"
+        :startRow="row" 
+        :startCol="col"
+        :canMove="canMove"
+        @playerMoved="waitTwoSeconds"
+        ref="boardRef"/>
+      <div style="margin-start: 16px">
+        <div id="timer">
+          <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
+          <h1 v-else>Move in: {{ dialogTimer }}</h1>
+        </div>
+        <div v-if="playerIsHost">
+          <div>You are the host.</div>
+          <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
+        </div>
+        <div v-if="this.gameStarted">
+          <h3>Game has started.</h3>
+          <div v-if="player && player.infected">You are infected.</div>
+          <div v-else>You are clean.</div>
+          <div v-if="forceMoveTimer != 0">You will be forcefully moved in {{forceMoveTimer}}</div>
+        </div>
+      </div>
+      <Dialog :isOpen="dialogOpen" :timer="dialogTimer" :message="dialogMessage" @contact="showDialog"/>
+    </div>
   </div>
 </template>
 
@@ -47,6 +52,7 @@ import Square from '@/model/dataobjects/Square'
 import PlayerRepository from '@/model/repository/playerRepository'
 import GameRepository from '@/model/repository/gameRepository'
 import GameHelper from '@/helpers/GameHelper'
+import Helper from '@/helpers/helper'
 import Board from './Board'
 import _ from 'underscore'
 import Dialog from './Dialog.vue'
@@ -70,7 +76,8 @@ export default {
       hasMovedAfterContact: false,
       cleanCount: 0,
       infectedCount: 0,
-      connectionListener: null
+      connectionListener: null,
+      mapConfig: 0
     }
   },
   firebase: {
@@ -103,7 +110,7 @@ export default {
     },
 
     minPlayersReached() {
-      return this.players.length >= 4
+      return this.players.length >= 1
     },
 
     lobbyIsFull() {
@@ -122,13 +129,21 @@ export default {
   methods: {
     async enterGame(payload) {
       const { roomCode, isNewRoom, name } = payload
+
       this.playerID = Date.now().toString()
       this.gameID = roomCode
-      this.setStartingPos()
+    
+      if (isNewRoom) {
+        this.mapConfig = Helper.getRandomInt(1, 5)
+      } else {
+        this.mapConfig = this.game.mapConfig
+      }
+
+      this.setStartingPos(this.mapConfig)
 
       // If new room, create a new game 
       if (isNewRoom) {
-        await GameRepository.initGame(this.gameID)
+        await GameRepository.initGame(this.gameID, this.mapConfig)
       }
 
       // Add the player to the game object
@@ -138,7 +153,8 @@ export default {
         name,
         square: new Square(this.row, this.col),
         online: true,
-        host: isNewRoom // player is host if he created a new room
+        host: isNewRoom, // player is host if he created a new room
+        playerNum: this.players.length + 1
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
 
@@ -195,11 +211,11 @@ export default {
       }
       
       this.canMove = true
-      GameRepository.startGame(this.gameID, this.players.length - sampleSize, sampleSize)
+      GameRepository.startGame(this.gameID, this.players.length - sampleSize, sampleSize, this.mapConfig)
     },
 
-    setStartingPos() {
-      const square = GameHelper.getStartingSquare(this.players)
+    setStartingPos(mapConfig) {
+      const square = GameHelper.getStartingSquare(this.players, mapConfig)
       this.row = square.row
       this.col = square.col
     },

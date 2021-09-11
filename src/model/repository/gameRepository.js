@@ -3,19 +3,21 @@ import firebase from 'firebase'
 
 export default class GameRepository {
 
-  static initGame(id) {
+  static initGame(id, map) {
     db.ref(`game/${id}`).set({ 
       gameStarted: false,
       cleanCount: 0,
-      infectedCount: 0
+      infectedCount: 0,
+      mapConfig: map
     })
   }
 
-  static startGame(id, cleanCount, infectedCount) {
+  static startGame(id, cleanCount, infectedCount, mapConfig) {
     db.ref(`game/${id}`).set({
       gameStarted: true,
       cleanCount,
-      infectedCount
+      infectedCount,
+      mapConfig
     })
   }
 

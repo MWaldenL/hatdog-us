@@ -1,5 +1,5 @@
 export default class Player {
-  constructor({id, gameID, name, square, online, host}) {
+  constructor({id, gameID, name, square, online, host, playerNum}) {
     this.id = id
     this.gameID = gameID
     this.name = name
@@ -13,6 +13,8 @@ export default class Player {
       isReceiver: false,  //if the player (self) is a receiver
       otherName: ''       //name of the other player
     }
+    this.playerNum = playerNum
+    this.dir = 'down'
     // TODO: save initial infected state
   }
 }
