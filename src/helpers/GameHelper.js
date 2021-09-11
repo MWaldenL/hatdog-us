@@ -102,4 +102,25 @@ export default class GameHelper {
     }
     return res
   }
+
+  static generateEndGameMessage(teamInfectedWon, player) {
+    let header
+    let body
+
+    if (teamInfectedWon) {
+      body = "All players have been infected"
+      if (player.initiallyInfected)
+        header = "You win!"
+      else 
+        header = "You lose!"
+    }
+    else {
+      body = "All players have been cleaned"
+      if (!player.initiallyInfected)
+        header = "You win!"
+      else 
+        header = "You lose!"
+    }
+    return {header: header, body: body}
+  }
 }

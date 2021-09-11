@@ -4,8 +4,8 @@
       <div v-if="isOpen">
         <div class="overlay">
           <div class="modal">
-            <h1>{{message}}</h1>
-            <p>Closing in {{timer}}</p>
+            <h1>{{header}}</h1>
+            <p>{{body}}</p>
           </div>
         </div>
       </div>
@@ -16,9 +16,9 @@
 <script>
 export default {
   props: {
-    isOpen: Boolean,
-    timer: Number,
-    message: String
+    header: String,
+    body: String, 
+	isOpen: Boolean
   }
 }
 </script>
