@@ -23,22 +23,23 @@
         :canMove="canMove"
         @playerMoved="waitTwoSeconds"
         ref="boardRef"/>
-      <div id="timer">
-        <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
-        <h1 v-else>Move in: {{ dialogTimer }}</h1>
-      </div>
-      <div v-if="playerIsHost">
-        <div>You are the host.</div>
-        <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
+      <div>
+        <div id="timer">
+          <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
+          <h1 v-else>Move in: {{ dialogTimer }}</h1>
+        </div>
+        <div v-if="playerIsHost">
+          <div>You are the host.</div>
+          <div><button @click="startGame" :disabled="!minPlayersReached">Start Game</button></div>
+        </div>
+        <div v-if="this.gameStarted">
+          <h3>Game has started.</h3>
+          <div v-if="player && player.infected">You are infected.</div>
+          <div v-else>You are clean.</div>
+          <div v-if="forceMoveTimer != 0">You will be forcefully moved in {{forceMoveTimer}}</div>
+        </div>
       </div>
       <Dialog :isOpen="dialogOpen" :timer="dialogTimer" :message="dialogMessage" @contact="showDialog"/>
-      <!-- TODO: FIX UI -->
-      <div v-if="this.gameStarted">
-        Game has started.
-        <div v-if="player && player.infected">You are infected.</div>
-        <div v-else>You are clean.</div>
-        <div v-if="forceMoveTimer != 0">You will be forcefully moved in {{forceMoveTimer}}</div>
-      </div>
     </div>
   </div>
 </template>
@@ -109,7 +110,7 @@ export default {
     },
 
     minPlayersReached() {
-      return this.players.length >= 4
+      return this.players.length >= 1
     },
 
     lobbyIsFull() {
