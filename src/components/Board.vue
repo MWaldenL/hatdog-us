@@ -94,7 +94,7 @@ export default {
     
     move(direction) {
       if (this.canMove && this.currentGame.gameStarted) {
-        const newSquare = BoardHelper.move(this.playerID, direction, this.board, this.row, this.col, this.currentGame.mapConfig)
+        const newSquare = BoardHelper.move(direction, this.board, this.row, this.col, this.currentGame.mapConfig)
         if (newSquare !== false) {
 
           let dir = ""
@@ -135,13 +135,12 @@ export default {
         let newSquare
         do {
           newSquare = BoardHelper.randomMove(
-            this.playerID, 
             this.board, 
             this.row, 
             this.col,
             this.currentGame.mapConfig)
         }
-        while (newSquare !== false)
+        while (newSquare === false)
 
         this.row = newSquare.row
         this.col = newSquare.col
