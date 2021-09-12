@@ -11,12 +11,15 @@
         <p>Clean: {{cleanCount}}</p>
         <p>Infected: {{infectedCount}}</p>
         <h1>Players ({{ players.length }}):</h1> 
-        <ul v-for="player in players" :key="player.id">
-          <PlayerItem v-if="player.online" 
-            :name="player.name"
-            :num="player.playerNum" />
-          <!-- <li v-if="player.online">{{ player.name }}</li> -->
-        </ul>
+        <div>
+          <div v-for="player in players" :key="player.id">
+            <PlayerItem v-if="player.online" 
+              :name="player.name"
+              :num="player.playerNum"
+              :you="player.id === playerID" />
+            <!-- <li v-if="player.online">{{ player.name }}</li> -->
+          </div>
+        </div>
       </div>
       <Board 
         :gameID="gameID"

@@ -1,7 +1,7 @@
 <template>
   <div id="playerItem">
     <div :class="playerPiece('up', num)" />
-    <h3 id="playerName">{{ name }}</h3>
+    <h3 id="playerName">{{ name }} <span v-if="you">(You)</span></h3>
   </div>
 </template>
 
@@ -9,7 +9,8 @@
 export default {
   props: {
     name: String,
-    num: Number 
+    num: Number,
+    you: Boolean,
   },
   methods: {
     playerPiece(dir, num) {
@@ -27,7 +28,7 @@ export default {
 <style scoped>
 #playerItem {
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
 }
 #playerName {
