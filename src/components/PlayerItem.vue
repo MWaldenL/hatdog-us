@@ -1,7 +1,7 @@
 <template>
   <div id="playerItem">
     <div :class="playerPiece('up', num)" />
-    <h3 id="playerName">{{ name }} <span v-if="you">(You)</span></h3>
+    <h3 style="margin-start: 0px" id="playerName">{{ name }} <span v-if="you">(You)</span></h3>
   </div>
 </template>
 

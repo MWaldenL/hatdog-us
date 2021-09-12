@@ -205,7 +205,7 @@ export default {
         square: new Square(this.row, this.col),
         online: true,
         host: isNewRoom, // player is host if he created a new room
-        playerNum: this.players.length + 1
+        playerNum: this.getMissingPlayerNum()
       }))
       PlayerRepository.observeOnlineStatus(this.playerID)
 
@@ -213,6 +213,20 @@ export default {
       await this.setCurrentPlayer()
 
       await this.setTeamCountListener()
+    },
+
+    getMissingPlayerNum() {
+      let missingNum = 1
+      let playerNums = this.players.map(p => p.playerNum).sort()
+      console.log(`player nums: ${playerNums}`)
+      for (let pNum of playerNums) {
+        console.log(`checking: ${pNum} vs ${missingNum}`)
+        if (missingNum < pNum)
+          return missingNum
+        missingNum++
+      }
+      console.log( `missing num: ${missingNum}`)
+      return missingNum
     },
 
     setCurrentPlayer() {
