@@ -299,7 +299,8 @@ export default {
       this.canMove = false
       let time = setInterval(() => {
         this.timer--
-        if (this.timer === 0) {
+        if (this.timer <= 0) {
+          this.timer = 0
           clearInterval(time)
           this.canMove = true
         }
@@ -315,7 +316,8 @@ export default {
       let forceTime = this.player.contactInfo.withAlly ? 2 : 3
       let time = setInterval(() => {
         this.dialogTimer--
-        if (this.dialogTimer === 0) {
+        if (this.dialogTimer <= 0) {
+          this.dialogTimer = 0
           clearInterval(time)
           this.dialogOpen = false
           this.waitForcedMove(forceTime)
@@ -351,7 +353,8 @@ export default {
       
       let time = setInterval(() => {
         this.forceMoveTimer--
-        if (this.forceMoveTimer === 0) {
+        if (this.forceMoveTimer <= 0) {
+          this.forceMoveTimer = 0
           if (!this.hasMovedAfterContact) {
             this.$refs.boardRef.randomMove();
           }
