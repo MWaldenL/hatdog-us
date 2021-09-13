@@ -312,7 +312,7 @@ export default {
       this.dialogMessage = GameHelper.generateDialogMessage(this.player)
       this.dialogOpen = true
       this.canMove = false
-      this.dialogTimer = 5
+      this.dialogTimer = 3
       let forceTime = this.player.contactInfo.withAlly ? 2 : 3
       let time = setInterval(() => {
         this.dialogTimer--
