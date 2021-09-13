@@ -72,8 +72,7 @@ export default class BoardHelper {
 
   static isSquareOccupied(players, row, col) {
     for (let player of players) {
-      let { r, c } = player.square
-      if (row === r && col == c) {
+      if (player.square.row === row && col === player.square.col) {
         return true
       }
     }
