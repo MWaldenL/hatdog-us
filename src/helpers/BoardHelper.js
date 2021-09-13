@@ -72,8 +72,7 @@ export default class BoardHelper {
 
   static isSquareOccupied(players, row, col) {
     for (let player of players) {
-      let { r, c } = player.square
-      if (row === r && col == c) {
+      if (player.square.row === row && col === player.square.col) {
         return true
       }
     }
@@ -107,7 +106,6 @@ export default class BoardHelper {
 
   static getOtherPlayerInSquare(selfId, board, row, col) {
     let playersSet = board[row][col].currentPlayers
-    console.log(playersSet)
     let playerArr = [...playersSet].filter(p => p.id !== selfId)
     return playerArr[0]
   }
