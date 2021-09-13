@@ -82,9 +82,9 @@ export default class BoardHelper {
 
   static isMinTwoSquaresApart(players, row, col) {
     for (let player of players) {
-      let r = player.row
-      let c = player.col
-      
+      let r = player.square.row
+      let c = player.square.col
+
       // check vertical
       if (row === r && this._absDiff(c, col) <= 2)
         return false

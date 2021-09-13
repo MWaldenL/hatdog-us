@@ -86,13 +86,6 @@ export default {
         })
       }
     },
-/*     createRoom() {
-      this.$emit('enterGame', { 
-        roomCode: Helper.getRoomCode(),
-        isNewRoom: true,
-        name: this.name
-      })
-    }, */
     back() {
       this.currentPage = 'entry'
     }

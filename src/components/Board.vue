@@ -128,7 +128,9 @@ export default {
     },
 
     showPlayers() {
-      this.board = GameHelper.getBoardWithPlayers(this.playersInGame, this.currentGame.mapConfig)
+      if (this.currentGame) {
+        this.board = GameHelper.getBoardWithPlayers(this.playersInGame, this.currentGame.mapConfig)
+      }
     },
 
     randomMove() {
