@@ -27,13 +27,14 @@
         :startRow="row" 
         :startCol="col"
         :canMove="canMove"
-        @playerMoved="waitTwoSeconds"
+        @playerMoved="waitOneSecond"
         ref="boardRef"/>
       <!-- Timer -->
       <div style="margin-start: 16px">
         <div id="timer">
-          <h1 v-if="dialogTimer == 0">Move in: {{ timer }}</h1>
-          <h1 v-else>Move in: {{ dialogTimer }}</h1>
+          <h1>Move in:</h1>
+          <h1 v-if="dialogTimer == 0">0.{{ timer }}s</h1>
+          <h1 v-else>{{ dialogTimer }}s</h1>
         </div>
         <div v-if="playerIsHost">
           <div>You are the host.</div>
@@ -125,7 +126,7 @@ export default {
     },
 
     minPlayersReached() {
-      return this.players.length >= 4
+      return this.players.length >= 1
     },
 
     lobbyIsFull() {
@@ -291,10 +292,10 @@ export default {
       this.col = square.col
     },
 
-    waitTwoSeconds() {
+    waitOneSecond() {
       if (!this.game.gameStarted) { return }
       this.hasMovedAfterContact = true //used in forced move
-      this.timer = 2
+      this.timer = 10
       this.canMove = false
       let time = setInterval(() => {
         this.timer--
@@ -302,7 +303,7 @@ export default {
           clearInterval(time)
           this.canMove = true
         }
-      }, 1000)
+      }, 100)
     },
 
     showDialog() {
