@@ -7,12 +7,14 @@ export default class Helper {
     return Math.floor(Math.random() * (max - min) + min);
   }
 
-  static getRoomCode() {
+  static getRoomCode(existingCodes) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     let res = ''
-    for (let i=0; i < 4; i++) { 
-      res += chars.charAt(this.getRandomInt(0, chars.length))
-    }
+    do {
+      for (let i=0; i < 4; i++) { 
+        res += chars.charAt(this.getRandomInt(0, chars.length))
+      }
+    } while (existingCodes.includes(res))
     return res
   }
 

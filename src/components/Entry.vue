@@ -6,7 +6,7 @@
   </div>
   <div id="roomCodeForm" v-else-if="currentPage === 'roomCodeForm'">
     <h1 v-if="existingRoom">Enter room code:</h1> 
-    <input type="text" v-if="existingRoom" @keyup.enter="enterRoom" v-model="roomCode" />
+    <input type="text" v-if="existingRoom" v-model="roomCode" />
     <p class="err-message" v-if="!firstTime && !doesGameExist">This game does not exist.</p>
     <p class="err-message" v-if="isGameFull">This game is full.</p>
     <p class="err-message" v-if="isGameStarted">This game has already started.</p>
@@ -79,8 +79,9 @@ export default {
           name: this.name
         })
       } else {
+        const existingCodes = this.games.map(val => val['.key'])
         this.$emit('enterGame', { 
-          roomCode: Helper.getRoomCode(),
+          roomCode: Helper.getRoomCode(existingCodes),
           isNewRoom: true,
           name: this.name
         })
